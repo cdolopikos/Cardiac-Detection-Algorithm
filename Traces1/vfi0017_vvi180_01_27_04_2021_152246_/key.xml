@@ -1,0 +1,206 @@
+<Root_Element>
+   <timing>
+      <!--method should be EXPLICIT or TRIGGER-->
+      <method>trigger</method>
+      <trigger>
+         <channel>boxa</channel>
+         <tolerance>0.1</tolerance>
+         <stabilisation_samples>20</stabilisation_samples>
+      </trigger>
+      <explicit>
+         <!--Usu 1000 samples per unit time, and INCLUDE an event at time "1" to label the initial state-->
+         <samples_per_unit_time>1000</samples_per_unit_time>
+         <time>39</time>
+         <time>44</time>
+         <time>50</time>
+         <time>55</time>
+      </explicit>
+   </timing>
+   <parameters>
+      <parameter>av</parameter>
+      <parameter>vv</parameter>
+      <parameter>hrate</parameter>
+   </parameters>
+   <av>
+      <!--method should be "manual" or "alternating" or "lookup"-->
+      <method>lookup</method>
+      <units>ms</units>
+      <manual>
+         <!--For a fixed value, just put one value.-->
+         <!--For swapping back between two values, put the two of them.-->
+         <!--For a longer cycle, put the items in the cycle.-->
+         <!--To specify what happens at each transion, put a value for each transition (including one at the beginning)-->
+         <value>120</value>
+         <value>160</value>
+         <value>190</value>
+      </manual>
+      <alternating>
+         <!--In alternating, whenever a transition occurs (by EXPLICIT timing or on TRIGGERing), -->
+         <!--the voltage is read and if close to the default voltage, we read the default value of this parameter-->
+         <channel>boxa</channel>
+         <tolerance>0.1</tolerance>
+         <stabilisation_samples>20</stabilisation_samples>
+         <default>
+            <voltage>1.18</voltage>
+            <value>120</value>
+         </default>
+         <other>
+            <value>160</value>
+         </other>
+      </alternating>
+      <lookup>
+         <channel>boxa</channel>
+         <stabilisation_samples>20</stabilisation_samples>
+         <pair>
+            <voltage>0</voltage>
+            <value>-100000</value>
+         </pair>
+         <pair>
+            <voltage>.2</voltage>
+            <value>20</value>
+         </pair>
+         <pair>
+            <voltage>.4</voltage>
+            <value>40</value>
+         </pair>
+         <pair>
+            <voltage>.6</voltage>
+            <value>60</value>
+         </pair>
+         <pair>
+            <voltage>.8</voltage>
+            <value>80</value>
+         </pair>
+         <pair>
+            <voltage>1.0</voltage>
+            <value>100</value>
+         </pair>
+         <pair>
+            <voltage>1.2</voltage>
+            <value>120</value>
+         </pair>
+         <pair>
+            <voltage>1.4</voltage>
+            <value>140</value>
+         </pair>
+         <pair>
+            <voltage>1.6</voltage>
+            <value>160</value>
+         </pair>
+         <pair>
+            <voltage>1.8</voltage>
+            <value>180</value>
+         </pair>
+         <pair>
+            <voltage>2.0</voltage>
+            <value>200</value>
+         </pair>
+         <pair>
+            <voltage>2.2</voltage>
+            <value>220</value>
+         </pair>
+         <pair>
+            <voltage>2.4</voltage>
+            <value>240</value>
+         </pair>
+         <pair>
+            <voltage>3</voltage>
+            <value>100000</value>
+         </pair>
+      </lookup>
+   </av>
+   <vv>
+      <!--method should be "manual" or "alternating" or "lookup"-->
+      <method>manual</method>
+      <units>ms</units>
+      <manual>
+         <!--For a fixed value, just put one value.-->
+         <!--For swapping back between two values, put the two of them.-->
+         <!--For a longer cycle, put the items in the cycle.-->
+         <!--To specify what happens at each transion, put a value for each transition (including one at the beginning)-->
+         <value>0</value>
+      </manual>
+      <alternating>
+         <!--In alternating, whenever a transition occurs (by EXPLICIT timing or on TRIGGERing), -->
+         <!--the voltage is read and if close to the default voltage, we read the default value of this parameter-->
+         <channel>BOXB</channel>
+         <tolerance>0.1</tolerance>
+         <stabilisation_samples>20</stabilisation_samples>
+         <default>
+            <voltage>1.18</voltage>
+            <value>120</value>
+         </default>
+         <other>
+            <value>160</value>
+         </other>
+      </alternating>
+      <lookup>
+         <channel>BOXB</channel>
+         <stabilisation_samples>20</stabilisation_samples>
+         <pair>
+            <voltage>0</voltage>
+            <value>-100000</value>
+         </pair>
+         <pair>
+            <voltage>.2</voltage>
+            <value>20</value>
+         </pair>
+         <pair>
+            <voltage>.4</voltage>
+            <value>40</value>
+         </pair>
+         <pair>
+            <voltage>.6</voltage>
+            <value>60</value>
+         </pair>
+         <pair>
+            <voltage>.8</voltage>
+            <value>80</value>
+         </pair>
+         <pair>
+            <voltage>1.0</voltage>
+            <value>100</value>
+         </pair>
+         <pair>
+            <voltage>1.2</voltage>
+            <value>120</value>
+         </pair>
+         <pair>
+            <voltage>1.4</voltage>
+            <value>140</value>
+         </pair>
+         <pair>
+            <voltage>1.6</voltage>
+            <value>160</value>
+         </pair>
+         <pair>
+            <voltage>1.8</voltage>
+            <value>180</value>
+         </pair>
+         <pair>
+            <voltage>2.0</voltage>
+            <value>200</value>
+         </pair>
+         <pair>
+            <voltage>2.2</voltage>
+            <value>220</value>
+         </pair>
+         <pair>
+            <voltage>2.4</voltage>
+            <value>240</value>
+         </pair>
+         <pair>
+            <voltage>3</voltage>
+            <value>100000</value>
+         </pair>
+      </lookup>
+   </vv>
+   <hrate>
+      <!--method usually should be "manual"-->
+      <method>manual</method>
+      <units>bpm</units>
+      <manual>
+         <value>60</value>
+      </manual>
+   </hrate>
+</Root_Element>
