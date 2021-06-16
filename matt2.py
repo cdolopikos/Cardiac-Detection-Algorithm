@@ -65,6 +65,16 @@ def dynamic_smoothing(x):
         smoothed.append(sum(x[w0:w1]) / (w1 - w0))
     return np.array(smoothed)
 
+def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
+    promper = statistics.mean(signal_with_lag)
+    min_per_peaks, properties = find_peaks(signal_with_lag * -1, prominence=-promper, width=20)
+    min_per_peaks = list(min_per_peaks)
+    lag=0
+    for i in min_per_peaks:
+        if egm_start_time<=i<=egm_end_time:
+            lag=abs(egm_start_time-i)
+    return lag
+
 
 class Data_Reader:
     def __init__(self, data_path):
@@ -139,7 +149,7 @@ class PerfusionDetector:
 
 class BPDetector:
 
-    V_to_mmHg_factor = 100
+    # V_to_mmHg_factor = 100
 
     def __init__(self):
         self.buffer = np.zeros(2000)
@@ -154,7 +164,8 @@ class BPDetector:
     def load_new_data(self, perfusion: Data_Reader):
         self.buffer = np.roll(self.buffer, -200)
         #self.buffer[0:1800] = self.buffer[200:2000]
-        self.buffer[1800:2000] = perfusion.get_next_data(amount=200) * self.V_to_mmHg_factor
+        # self.buffer[1800:2000] = perfusion.get_next_data(amount=200) * self.V_to_mmHg_factor
+        self.buffer[1800:2000] = perfusion.get_next_data(amount=200)
 
     def detect_new_data(self):
         buffer = self.buffer.copy()
@@ -255,7 +266,8 @@ def main(electrogram_path, perfusion_path, bp_path, period):
     # tmp=[]
 
     while True:
-        print(f"count: {count}")
+        # print(f"count: {count}")
+        # Setting up the data instreams
         try:
             electrogram_detector.load_new_data(electrogram)
             perfusion_det.load_new_data(perfusion)
@@ -268,6 +280,7 @@ def main(electrogram_path, perfusion_path, bp_path, period):
             print("Out of data")
             break
 
+        # EGM Peak detection
         prom = np.mean(ecg_out)
         peaks, properties = find_peaks(ecg_out, prominence=prom, width=20)
 
@@ -282,15 +295,15 @@ def main(electrogram_path, perfusion_path, bp_path, period):
                 mat_pks.appendleft(peak_global_time)
 
         for start_global_time, end_global_time in peak_pairs_to_process:
-            start_local_time = start_global_time - (count*200)
-            end_local_time = end_global_time - (count*200)
+            start_local_time = start_global_time - (count*STEP_SIZE)
+            end_local_time = end_global_time - (count*STEP_SIZE)
 
             rr_interval = end_global_time - start_global_time
             bpm_interval = 60_000 / rr_interval
-
-            mean_bp_interval = np.mean(bp_det.buffer[(start_local_time+BP_LAG):(end_local_time+BP_LAG)])
-            max_bp_interval = np.max(bp_det.buffer[(start_local_time+BP_LAG):(end_local_time+BP_LAG)])
-            min_bp_interval = np.min(bp_det.buffer[(start_local_time+BP_LAG):(end_local_time+BP_LAG)])
+            BP_lag=lag_calc(start_local_time,end_local_time,bp_out)
+            mean_bp_interval = np.mean(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
+            max_bp_interval = np.max(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
+            min_bp_interval = np.min(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
 
             egmMean_interval = np.mean(ecg_out[start_local_time:end_local_time])
             egmSTD_interval = np.std(ecg_out[start_local_time:end_local_time])
@@ -310,8 +323,10 @@ def main(electrogram_path, perfusion_path, bp_path, period):
 
             interval_stats.update(update_dict)
 
+            # Perfusion
             perfusion_cut = np.zeros(2000) * np.nan
-            perfusion_cut[:rr_interval] = perfusion_det.buffer[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]
+            PERFUSION_lag=lag_calc(start_local_time,end_local_time,per_out)
+            perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_lag):(end_local_time+PERFUSION_lag)]
             mat.appendleft(perfusion_cut)
 
             perfusion_mat = np.array(mat)
@@ -383,7 +398,7 @@ def main(electrogram_path, perfusion_path, bp_path, period):
                     pass
 
                 try:
-                    curve2.setData(x=np.arange(len(perfusion_det.buffer)), y=perfusion_det.buffer)
+                    curve2.setData(x=np.arange(len(per_out)), y=per_out)
                 except Exception as e:
                     pass
 
@@ -393,7 +408,7 @@ def main(electrogram_path, perfusion_path, bp_path, period):
 
 
         count = count + 1
-        time.sleep(0.2)
+        # time.sleep(0.2)
 
     return output
 
