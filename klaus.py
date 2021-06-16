@@ -23,10 +23,6 @@ ee1 = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/AD
 bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/ADA003_03_12_01_2021_154719_/BP.txt"
 
 
-STEP_SIZE = 200
-BP_LAG = 200
-PERFUSION_LAG = 250
-
 def butter_lowpass(cutoff, fs, order):
     nyq = 0.5 * fs
     normal_cutoff = cutoff / nyq
@@ -124,7 +120,7 @@ class PerfusionDetector:
 
     def load_new_data(self, perfusion: Data_Reader):
         self.buffer = np.roll(self.buffer, -200)
-        #self.buffer[0:1800] = self.buffer[200:2000]
+        # self.buffer[0:1800] = self.buffer[200:2000]
         self.buffer[1800:2000] = perfusion.get_next_data(amount=200)
 
     def detect_new_data(self):
@@ -149,11 +145,11 @@ class BPDetector:
 
     def load_new_data(self, perfusion: Data_Reader):
         self.buffer = np.roll(self.buffer, -200)
-        #self.buffer[0:1800] = self.buffer[200:2000]
+        # self.buffer[0:1800] = self.buffer[200:2000]
         self.buffer[1800:2000] = perfusion.get_next_data(amount=200)
 
     def detect_new_data(self):
-        buffer = self.buffer.copy()
+        buffer = self.buffer
         buffer = (buffer - min(buffer)) / (max(buffer) - min(buffer))
         window_size = 100
         window = np.ones(window_size) / float(window_size)
@@ -209,9 +205,6 @@ def main(electrogram_path, perfusion_path, bp_path, period):
 
     mat = collections.deque(6 * [0], 6)
     mat_pks = collections.deque(50 * [0], 50)
-
-    last_ecg_peak_time = 0
-
     # print(mat_pks)
     ecg_peaks_total = []
     ecg_pks = []
@@ -247,7 +240,6 @@ def main(electrogram_path, perfusion_path, bp_path, period):
     rr_interval = 1000
     finish = 400
     # tmp=[]
-
     while True:
         try:
             electrogram_detector.load_new_data(electrogram)
@@ -264,80 +256,47 @@ def main(electrogram_path, perfusion_path, bp_path, period):
             c = np.arange(len(raw))
             curve3.setData(x=c, y=raw)
 
-            peaks, properties = find_peaks(ecg_out, prominence=prom, width=20)
-            dot1.setData(x=peaks, y=ecg_out[peaks])
-
-            peak_pairs_to_process = []
-
-            for p in list(peaks):
-                # global index
-                if p > 1400 and p <= 1600:
-                    peak_global_time = p + (count*STEP_SIZE)
-                    peak_pairs_to_process.append((peak_global_time, mat_pks[-1]))
-                    mat_pks.appendleft(peak_global_time)
-
-            for start_global_time, end_global_time in peak_pairs_to_process:
-                start_local_time = start_global_time - (count*200)
-                end_local_time = end_global_time - (count*200)
-
-                rr_interval = end_global_time - start_global_time
-                bmp_interval = 60_000 / rr_interval
-
-                mean_bp_interval = np.mean(bp_det.buffer[(start_local_time+BP_LAG):(end_local_time+BP_LAG)])
-                max_bp_interval = np.max(bp_det.buffer[(start_local_time+BP_LAG):(end_local_time+BP_LAG)])
-                min_bp_interval = np.min(bp_det.buffer[(start_local_time+BP_LAG):(end_local_time+BP_LAG)])
-
-                egmMean = np.mean(ecg_out[start_local_time:end_local_time])
-                egmSTD = np.std(ecg_out[start_local_time:end_local_time])
-                egmSkew = skew(ecg_out[start_local_time:end_local_time])
-                egmKurtosis = kurtosis(ecg_out[start_local_time:end_local_time])
-
-                perfusion_cut = np.zeros(2000) * np.nan
-                perfusion_cut[:rr_interval] = perfusion_det.buffer[start_local_time:end_local_time]
-                mat.appendleft(perfusion_cut)
-
-                print(f"RR: {rr_interval}")
-
-
-
-
-
             bpln = np.arange(len(bp_out))
-            avgbp = np.mean(bp_det.buffer)*100
-            maxbp = max(bp_det.buffer)*100
+            avgbp = np.mean(bp_det.buffer) * 100
+            maxbp = max(bp_det.buffer) * 100
 
             # EGM
             prom = statistics.mean(ecg_out)
-
-
+            peaks, properties = find_peaks(ecg_out, prominence=prom, width=20)
+            dot1.setData(x=peaks, y=ecg_out[peaks])
 
             # print(peaks)
             # opote afto pou kaneis einai oti kathe fora pairneis to index 0 apo tin lista kai to 1 an iparxei pou tha iparxei
             # print(mat_pks)
-
-
-
-
-
+            for p in list(peaks):
+                # global index
+                mat_pks.appendleft((p + (count * 200)))
+            ecg_peaks_total.append(peaks)
+            egmMean = sum(ecg_out) / len(ecg_out)
+            egmSTD = np.std(ecg_out)
+            egmSkew = skew(ecg_out)
+            egmKurtosis = kurtosis(ecg_out)
             local_index1 = [mat_pks[0]]
-            if len(peaks)>1:
+            if len(peaks) > 1:
                 rr_interval = abs(int(peaks[0]) - int(peaks[1]))
                 if rr_interval == 0:
-                    rr_interval=200
+                    rr_interval = 200
             bps = len(local_index1)
             print(rr_interval)
-            bpmtmp=len(peaks)
-            bpm = (60000/rr_interval)
+            bpmtmp = len(peaks)
+            bpm = (60000 / rr_interval)
             stats.update(
-                {"Max Actual BP": maxbp, "Mean Actual BP": avgbp, "Beats per Second (1000ms)": bps, "BPM":bpm,"EGM Mean RV": egmMean,
-                 "EGM STD RV": egmSTD, "EGM Skewness RV": egmSkew, "EGM Kurtosis RV": egmKurtosis, "R-R Interval RV":rr_interval})
-
+                {"Max Actual BP": maxbp, "Mean Actual BP": avgbp, "Beats per Second (1000ms)": bps, "BPM": bpm,
+                 "EGM Mean RV": egmMean,
+                 "EGM STD RV": egmSTD, "EGM Skewness RV": egmSkew, "EGM Kurtosis RV": egmKurtosis,
+                 "R-R Interval RV": rr_interval})
 
             # Perfusion
             # promper = statistics.mean(per_out)
+
             min_per_peaks, properties = find_peaks(per_out * -1, prominence=-0.5, width=30)
             min_per_peaks = np.array(min_per_peaks)
-            per_peaks, properties = find_peaks(per_out, prominence=0.3,width=30)
+            per_peaks, properties = find_peaks(per_out, prominence=0.3, width=30)
             per_peaks = np.array(per_peaks)
             tmp = []
 
@@ -356,25 +315,25 @@ def main(electrogram_path, perfusion_path, bp_path, period):
                 start = peaks[i]
                 finish = peaks[i + 1]
                 dx = int(abs(start - finish))
-                start = start + int(dx*0.65)
+                start = start + int(dx * 0.65)
                 start = min_per_peaks[np.abs(min_per_peaks - start).argmin()]
                 # if abs(peaks[i] - start)<200:
                 #     print(start)
                 #     print(min_per_peaks)
                 #     np.delete(min_per_peaks,np.where(min_per_peaks==start))
                 #     start = min_per_peaks[np.abs(min_per_peaks - (start)).argmin()]
-                if start <0:
-                    start=0
-                print("start",start)
+                if start < 0:
+                    start = 0
+                print("start", start)
 
-                finish = finish + int(dx*0.65)
+                finish = finish + int(dx * 0.65)
                 finish = min_per_peaks[np.abs(min_per_peaks - (finish)).argmin()]
                 # if abs(peaks[i + 1] - finish)<200:
                 #     print(finish)
                 #     print(min_per_peaks)
                 #     np.delete(min_per_peaks,np.where(min_per_peaks==finish))
                 #     finish = min_per_peaks[np.abs(min_per_peaks - (finish)).argmin()]
-                print("finish",finish)
+                print("finish", finish)
                 # if len(per_peaks)!=0:
                 #     if start < per_peaks[np.abs(per_peaks-(finish)).argmin()]< finish:
                 tmp = per_out[start:finish]
@@ -395,8 +354,8 @@ def main(electrogram_path, perfusion_path, bp_path, period):
                     xmax = np.where(tmp == max(tmp))[0][0]
                     # print("y1", xmax)
                 print("tmp", tmp)
-                print("tmp[xmax]",tmp[xmax])
-                print("tmp[0]",tmp[0])
+                print("tmp[xmax]", tmp[xmax])
+                print("tmp[0]", tmp[0])
                 theta = abs(tmp[xmax] - tmp[0]) / xmax * 1000
                 tmpgrad = math.degrees(math.atan(theta))
                 bp = int(tmpgrad * (xmax) * 0.00750062)
@@ -442,7 +401,7 @@ def main(electrogram_path, perfusion_path, bp_path, period):
                 grad = math.degrees(math.atan(tan))
                 percumMean = sum(cons) / len(cons)
                 percumSTD = np.std(cons)
-                print("00000000000000000000000000000000",percumSTD)
+                print("00000000000000000000000000000000", percumSTD)
                 percumSkew = skew(cons)
                 percumKurtosis = kurtosis(cons)
                 # print(grad)
@@ -471,7 +430,7 @@ def main(electrogram_path, perfusion_path, bp_path, period):
             curve2.setData(x=b, y=(per_out))
 
             QtGui.QGuiApplication.processEvents()
-            output=output.append(stats, ignore_index=True)
+            output = output.append(stats, ignore_index=True)
 
             count = count + 1
         except:
@@ -480,9 +439,10 @@ def main(electrogram_path, perfusion_path, bp_path, period):
 
     return output
 
+
 #
 if __name__ == '__main__':
     #     # plt.plot(np.genfromtxt(PERFUSION_PATH, delimiter=','))
     #     # plt.show()
-    output=main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
+    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
     output.to_csv("paok.csv")

@@ -137,9 +137,9 @@ class BPDetector:
         self.n = int(self.T * self.fs)
         self.detected_qrs = []
 
-    def load_new_data(self, perfusion: Data_Reader):
+    def load_new_data(self, bp: Data_Reader):
         self.buffer[0:1000] = self.buffer[200:1200]
-        self.buffer[1000:1200] = perfusion.get_next_data(amount=200)
+        self.buffer[1000:1200] = bp.get_next_data(amount=200)
 
     def detect_new_data(self):
         buffer = self.buffer
