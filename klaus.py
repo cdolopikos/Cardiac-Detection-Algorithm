@@ -158,7 +158,7 @@ class BPDetector:
 
 
 #
-def main(electrogram_path, perfusion_path, bp_path, period):
+def main(electrogram_path, perfusion_path, bp_path, period,decision):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     BP_PATH = bp_path
@@ -289,7 +289,7 @@ def main(electrogram_path, perfusion_path, bp_path, period):
                 {"Max Actual BP": maxbp, "Mean Actual BP": avgbp, "Beats per Second (1000ms)": bps, "BPM": bpm,
                  "EGM Mean RV": egmMean,
                  "EGM STD RV": egmSTD, "EGM Skewness RV": egmSkew, "EGM Kurtosis RV": egmKurtosis,
-                 "R-R Interval RV": rr_interval})
+                 "R-R Interval RV": rr_interval, "Decision":decision})
 
             # Perfusion
             # promper = statistics.mean(per_out)
@@ -435,14 +435,14 @@ def main(electrogram_path, perfusion_path, bp_path, period):
             count = count + 1
         except:
             print("An exception occurred")
-            break
+            continue
 
     return output
 
 
-#
-if __name__ == '__main__':
-    #     # plt.plot(np.genfromtxt(PERFUSION_PATH, delimiter=','))
-    #     # plt.show()
-    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
-    output.to_csv("paok.csv")
+# #
+# if __name__ == '__main__':
+#     #     # plt.plot(np.genfromtxt(PERFUSION_PATH, delimiter=','))
+#     #     # plt.show()
+#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
+#     output.to_csv("paok.csv")
