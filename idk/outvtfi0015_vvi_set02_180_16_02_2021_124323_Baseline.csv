@@ -1,0 +1,2 @@
+BP,BPM,Beats per Second (1000ms),Cumulative Perfusion Grad,Current Perfusion Grad,Decision,EGM Kurtosis RV,EGM Mean RV,EGM STD RV,EGM Skewness RV,Max Actual BP,Mean Actual BP,Per Cum. Kurtosis,Per Cum. Mean,Per Cum. STD,Per Cum. Skewness,Per Kurtosis,Per Mean,Per STD,Per Skewness,R-R Interval RV
+0.0,60.0,1.0,0.0,0.0,1.0,7.448396479675091,0.00959815859511535,0.026247293447134796,2.91301577628078,135.2,11.0455,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,1000.0

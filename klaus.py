@@ -235,7 +235,7 @@ def main(electrogram_path, perfusion_path, bp_path, period,decision):
              "Per Cum. Skewness": 0,
              "Per Cum. Kurtosis": 0,
              "Cumulative Perfusion Grad": 0,
-             "Decision": 0}
+             "Decision": decision}
     start = 0
     rr_interval = 1000
     finish = 400
@@ -289,7 +289,7 @@ def main(electrogram_path, perfusion_path, bp_path, period,decision):
                 {"Max Actual BP": maxbp, "Mean Actual BP": avgbp, "Beats per Second (1000ms)": bps, "BPM": bpm,
                  "EGM Mean RV": egmMean,
                  "EGM STD RV": egmSTD, "EGM Skewness RV": egmSkew, "EGM Kurtosis RV": egmKurtosis,
-                 "R-R Interval RV": rr_interval, "Decision":decision})
+                 "R-R Interval RV": rr_interval, "Decision": decision})
 
             # Perfusion
             # promper = statistics.mean(per_out)
@@ -435,9 +435,9 @@ def main(electrogram_path, perfusion_path, bp_path, period,decision):
             count = count + 1
         except:
             print("An exception occurred")
-            continue
+            return output
 
-    return output
+    # return output
 
 
 # #
