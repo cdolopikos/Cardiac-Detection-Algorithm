@@ -22,6 +22,7 @@ df = setData(path)
 x = df.iloc[:, 0:(len(df.columns) - 1)]
 # y gets all labels
 y = df.iloc[:, -1]
+print(y)
 # split x and y into training and test
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=66)
 
