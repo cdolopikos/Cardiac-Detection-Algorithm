@@ -279,8 +279,12 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             perfusion_det.load_new_data(perfusion)
             per_out = perfusion_det.detect_new_data()
+            if np.mean(per_out)<1:
+                per_out=per_out*100
             bp_det.load_new_data(bpdata)
             bp_out = bp_det.detect_new_data()
+            if np.mean(bp_out)<1:
+                bp_out=bp_out*100
 
         except Exception as e:
             print("Out of data")
@@ -338,14 +342,14 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             # Perfusion
             perfusion_cut = np.zeros(2000) * np.nan
-            # PERFUSION_lag=lag_calc(start_local_time,end_local_time,per_out)
+            PERFUSION_lag=lag_calc(start_local_time,end_local_time,per_out)
             # print(PERFUSION_lag)
             print("end_global_time",end_local_time)
             print("start_global_time",start_local_time)
             print("rr_interval",rr_interval)
-            print(len(per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]))
+            print(len(per_out[(start_local_time+PERFUSION_lag):(end_local_time+PERFUSION_lag)]))
 
-            perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]
+            perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_lag):(end_local_time+PERFUSION_lag)]
             print("perfusion_cut",perfusion_cut)
             mat.appendleft(perfusion_cut)
 
@@ -375,11 +379,25 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 print(perfusion_consensus_max)
                 print(perfusion_consensus_min)
                 print(perfusion_consensus_argmax)
-                theta = 1000 * (perfusion_consensus_max - perfusion_consensus_min) / perfusion_consensus_argmax
+                theta = ((perfusion_consensus_max - perfusion_consensus_min) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
+                print("!!!!!!!!!!!!!!Theta",theta)
                 tmpgrad = math.degrees(math.atan(theta))
+                print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad)
                 perSkew = skew(perfusion_consensus_argmax)
                 perKurtosis = kurtosis(perfusion_consensus_argmax)
                 bp_inteerval = int(tmpgrad * perfusion_consensus_argmax * 0.00750062)
+                if bp_inteerval <50:
+                    actual_predictedbp=bp_inteerval
+                    actual_theta=theta
+                    theta = theta *10
+                    tmpgrad = math.degrees(math.atan(theta))
+                    interval_stats.update({"predictedbp":actual_predictedbp,
+                           "actual_theta":actual_theta,
+                           "npargmax":perfusion_consensus_argmax,})
+                    bp_inteerval = int((tmpgrad * perfusion_consensus_argmax * 0.00750062)-perfusion_mean)
+                    if bp_inteerval<40:
+                        bp_inteerval=50
+                print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
             else:
                 bp_inteerval=0
                 tmpgrad=0
