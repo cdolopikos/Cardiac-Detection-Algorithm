@@ -21,7 +21,8 @@ def mlpDev():
     X_test = pd.DataFrame(X_test_array, index=X_test.index, columns=X_test.columns)
 
     # Initializing the multilayer perceptron
-    mlp = MLPClassifier(hidden_layer_sizes=20, solver='lbfgs', learning_rate_init=0.01, max_iter=1000)
+    mlp = MLPClassifier(hidden_layer_sizes=(25,11,7,5,3), solver='lbfgs', learning_rate_init=0.5, max_iter=10000)
+    mlp = MLPClassifier(hidden_layer_sizes=(512,256,128,64,32,8), solver='lbfgs', learning_rate_init=0.5, max_iter=10000)
     mlp.fit(X_train, y_train)
     # for i in y_train:
         # print(i)

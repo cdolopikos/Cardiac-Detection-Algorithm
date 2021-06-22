@@ -159,7 +159,7 @@ class PerfusionDetector:
 
 class BPDetector:
     def __init__(self):
-        self.buffer = np.zeros(1200)
+        self.buffer = np.zeros(2000)
         self.T = 1.2  # Sample Period
         self.fs = 1000.0  # sample rate, Hz
         self.cutoff = 150  # desired cutoff frequency of the filter, Hz ,      slightly higher than actual 1.2 Hz
@@ -169,8 +169,8 @@ class BPDetector:
         self.detected_qrs = []
 
     def load_new_data(self, bp: Data_Reader):
-        self.buffer[0:1000] = self.buffer[200:1200]
-        self.buffer[1000:1200] = bp.get_next_data(amount=200)
+        self.buffer[0:1800] = self.buffer[200:2000]
+        self.buffer[1800:2000] = bp.get_next_data(amount=200)
 
     def detect_new_data(self):
         buffer = self.buffer
@@ -181,7 +181,7 @@ class BPDetector:
         return out
 
 
-def main(electrogram_path, perfusion_path, bp_path, period):
+def main(electrogram_path, perfusion_path, bp_path, period, decision):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     BP_PATH = bp_path
@@ -258,12 +258,12 @@ def main(electrogram_path, perfusion_path, bp_path, period):
              "Per Skewness": 0,
              "Per Kurtosis": 0,
              "Current Perfusion Grad": 0,
-             "Per Cum. Mean": 0,
-             "Per Cum. STD": 0,
-             "Per Cum. Skewness": 0,
-             "Per Cum. Kurtosis": 0,
-             "Cumulative Perfusion Grad": 0,
-             "Decision": 0}
+             # "Per Cum. Mean": 0,
+             # "Per Cum. STD": 0,
+             # "Per Cum. Skewness": 0,
+             # "Per Cum. Kurtosis": 0,
+             # "Cumulative Perfusion Grad": 0,
+             "Decision": decision}
 
     start = 0
     rr_interval = 1000
@@ -285,96 +285,120 @@ def main(electrogram_path, perfusion_path, bp_path, period):
         except Exception as e:
             print("Out of data")
             break
-        try:
-            # EGM Peak detection
-            prom = np.mean(ecg_out)
-            peaks, properties = find_peaks(ecg_out, prominence=prom, width=20)
+        # try:
+        # EGM Peak detection
+        prom = np.mean(ecg_out)
+        peaks, properties = find_peaks(ecg_out, prominence=prom, width=20)
 
-            peak_pairs_to_process = []
+        peak_pairs_to_process = []
 
-            for p in list(peaks):
-                # global index
-                if p > 1400 and p <= 1600:
-                    peak_global_time = p + (count*STEP_SIZE)
-                    if len(mat_pks) > 0:
-                        peak_pairs_to_process.append((mat_pks[0], peak_global_time))
-                    mat_pks.appendleft(peak_global_time)
+        for p in list(peaks):
+            # global index
+            if p > 1400 and p <= 1600:
+                peak_global_time = p + (count*STEP_SIZE)
+                if len(mat_pks) > 0:
+                    peak_pairs_to_process.append((mat_pks[0], peak_global_time))
+                mat_pks.appendleft(peak_global_time)
 
-            for start_global_time, end_global_time in peak_pairs_to_process:
-                start_local_time = start_global_time - (count*STEP_SIZE)
-                end_local_time = end_global_time - (count*STEP_SIZE)
+        for start_global_time, end_global_time in peak_pairs_to_process:
+            start_local_time = start_global_time - (count*STEP_SIZE)
+            if start_local_time<0:
+                start_local_time=0
+            end_local_time = abs(end_global_time - (count*STEP_SIZE))
 
-                rr_interval = end_global_time - start_global_time
-                bpm_interval = 60000 / rr_interval
-                BP_lag=lag_calc(start_local_time,end_local_time,bp_out)
-                mean_bp_interval = np.mean(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
-                max_bp_interval = np.max(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
-                min_bp_interval = np.min(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
+            rr_interval = end_local_time - start_local_time
+            bpm_interval = 60000 / rr_interval
+            BP_lag=lag_calc(start_local_time,end_local_time,bp_out)
+            mean_bp_interval = np.mean(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
 
-                egmMean_interval = np.mean(ecg_out[start_local_time:end_local_time])
-                egmSTD_interval = np.std(ecg_out[start_local_time:end_local_time])
-                egmSkew_interval = skew(ecg_out[start_local_time:end_local_time])
-                egmKurtosis_interval = kurtosis(ecg_out[start_local_time:end_local_time])
+            print("bp lag time",BP_lag)
 
-                interval_stats = stats.copy()
+            print("len bp",len(bp_out))
+            print(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
+            max_bp_interval = np.max(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
+            min_bp_interval = np.min(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
 
-                update_dict = {"Max Actual BP": max_bp_interval,
-                               "Mean Actual BP": mean_bp_interval,
-                               "BPM": bpm_interval,
-                               "EGM Mean RV": egmMean_interval,
-                               "EGM STD RV": egmSTD_interval,
-                               "EGM Skewness RV": egmSkew_interval,
-                               "EGM Kurtosis RV": egmKurtosis_interval,
-                               "R-R Interval RV": rr_interval}
+            egmMean_interval = np.mean(ecg_out[start_local_time:end_local_time])
+            egmSTD_interval = np.std(ecg_out[start_local_time:end_local_time])
+            egmSkew_interval = skew(ecg_out[start_local_time:end_local_time])
+            egmKurtosis_interval = kurtosis(ecg_out[start_local_time:end_local_time])
 
-                interval_stats.update(update_dict)
+            interval_stats = stats.copy()
 
-                # Perfusion
-                perfusion_cut = np.zeros(2000) * np.nan
-                # PERFUSION_lag=lag_calc(start_local_time,end_local_time,per_out)
-                # print(PERFUSION_lag)
-                print(rr_interval)
-                print(len(per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]))
+            update_dict = {"Max Actual BP": max_bp_interval,
+                           "Mean Actual BP": mean_bp_interval,
+                           "BPM": bpm_interval,
+                           "EGM Mean RV": egmMean_interval,
+                           "EGM STD RV": egmSTD_interval,
+                           "EGM Skewness RV": egmSkew_interval,
+                           "EGM Kurtosis RV": egmKurtosis_interval,
+                           "R-R Interval RV": rr_interval}
 
-                perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]
+            interval_stats.update(update_dict)
 
-                mat.appendleft(perfusion_cut)
+            # Perfusion
+            perfusion_cut = np.zeros(2000) * np.nan
+            # PERFUSION_lag=lag_calc(start_local_time,end_local_time,per_out)
+            # print(PERFUSION_lag)
+            print("end_global_time",end_local_time)
+            print("start_global_time",start_local_time)
+            print("rr_interval",rr_interval)
+            print(len(per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]))
 
-                perfusion_mat = np.array(mat)
-                perfusion_consensus = np.nanmean(perfusion_mat, axis=0)
-                perfusion_consensus_mask = np.isnan(np.sum(perfusion_mat, axis=0))
+            perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]
+            print("perfusion_cut",perfusion_cut)
+            mat.appendleft(perfusion_cut)
 
-                perfusion_mean = np.nanmean(perfusion_consensus)
-                perfusion_sd = np.nanstd(perfusion_consensus)
+            perfusion_mat = np.array(mat)
+            print("perfusion_mat",perfusion_mat)
+            perfusion_consensus = np.nanmean(perfusion_mat, axis=0)
+            print("perfusion_consensus",perfusion_consensus)
+            perfusion_consensus_mask = np.isnan(np.sum(perfusion_mat, axis=0))
+            print(perfusion_consensus_mask)
+            perfusion_mean = np.nanmean(perfusion_consensus)
+            print(perfusion_mean)
+            perfusion_sd = np.nanstd(perfusion_consensus)
+            print(perfusion_sd)
 
-                perfusion_consensus[perfusion_consensus_mask] = np.nan
-
+            perfusion_consensus[perfusion_consensus_mask] = np.nan
+            print(perfusion_consensus)
+            try:
                 perfusion_consensus_argmax = np.nanargmax(perfusion_consensus)
-                perfusion_consensus_max = perfusion_consensus[perfusion_consensus_argmax]
-                perfusion_consensus_min = perfusion_consensus[0]
+            except:
+                continue
+            print(perfusion_consensus_argmax)
+            perfusion_consensus_max = perfusion_consensus[perfusion_consensus_argmax]
+            print(perfusion_consensus_max)
+            perfusion_consensus_min = perfusion_consensus[0]
+            print(perfusion_consensus_min)
+            if perfusion_consensus_argmax!=0:
+                print(perfusion_consensus_max)
+                print(perfusion_consensus_min)
+                print(perfusion_consensus_argmax)
+                theta = 1000 * (perfusion_consensus_max - perfusion_consensus_min) / perfusion_consensus_argmax
+                tmpgrad = math.degrees(math.atan(theta))
+                perSkew = skew(perfusion_consensus_argmax)
+                perKurtosis = kurtosis(perfusion_consensus_argmax)
+                bp_inteerval = int(tmpgrad * perfusion_consensus_argmax * 0.00750062)
+            else:
+                bp_inteerval=0
+                tmpgrad=0
+                perSkew=0
+                perKurtosis=0
 
-                if perfusion_consensus_argmax!=0:
-                    print(perfusion_consensus_max)
-                    print(perfusion_consensus_min)
-                    print(perfusion_consensus_argmax)
-                    theta = 1000 * (perfusion_consensus_max - perfusion_consensus_min) / perfusion_consensus_argmax
-                    tmpgrad = math.degrees(math.atan(theta))
-                    bp_inteerval = int(tmpgrad * perfusion_consensus_argmax * 0.00750062)
-                else:
-                    bp_inteerval=0
-                    tmpgrad=0
+            update_dict = {"BP": bp_inteerval,
+                           "Current Perfusion Grad": tmpgrad,
+                           "Per Mean": perfusion_mean,
+                           "Per STD": perfusion_sd,
+                           "Per Skewness": perSkew,
+                           "Per Kurtosis": perKurtosis}
 
-                update_dict = {"BP": bp_inteerval,
-                               "Current Perfusion Grad": tmpgrad,
-                               "Per Mean": perfusion_mean,
-                               "Per STD": perfusion_sd}
+            interval_stats.update(update_dict)
 
-                interval_stats.update(update_dict)
-
-                output.append(interval_stats)
-        except Exception as e:
-            print("Out of")
-            pass
+            output.append(interval_stats)
+        # except Exception as e:
+        #     print("Out of")
+        #     pass
 
             if not DEBUG:
                 curve1.setData(x=np.arange(len(ecg_out)), y=ecg_out)
@@ -429,13 +453,13 @@ def main(electrogram_path, perfusion_path, bp_path, period):
 
 
         count = count + 1
-        # time.sleep(0.2)
-
+        # time.sleep(2)
+    output=pd.DataFrame(output)
     return output
 
 
-if __name__ == '__main__':
-    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
-    output_pd = pd.DataFrame(output)
-    output_pd.to_csv("paok.csv")
-    print("Done")
+# if __name__ == '__main__':
+#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
+#     output_pd = pd.DataFrame(output)
+#     output_pd.to_csv("paok.csv")
+#     print("Done")
