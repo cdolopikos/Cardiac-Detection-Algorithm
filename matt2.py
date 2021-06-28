@@ -17,19 +17,21 @@ import time
 # ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Haem/Atach_CRTD_21_10_2020_164349_/boxb.txt"
 # bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/vfi0017_vvi180_01_27_04_2021_152246_/boxb.txt"
 
-pp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/vtfi0017_test_aai_his_27_04_2021_150217_/qfin.txt"
+pp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/VTFI0014_VVI_200_01_09_02_2021_123325_/BP.txt"
 # pp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/ADA003_03_12_01_2021_154719_/plethh.txt"
-ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/vtfi0017_test_aai_his_27_04_2021_150217_/BP.txt"
+# ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/vtfi0017_test_aai_his_27_04_2021_150217_/BP.txt"
+ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/VTFI0014_VVI_200_01_09_02_2021_123325_/ecg.txt"
 # ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/ADA003_03_12_01_2021_154719_/plethg.txt"
-ee1 = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/ADA003_03_12_01_2021_154719_/plethg.txt"
-bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/vtfi0017_test_aai_his_27_04_2021_150217_/boxb.txt"
+# ee1 = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/ADA003_03_12_01_2021_154719_/plethg.txt"
+# bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/vtfi0017_test_aai_his_27_04_2021_150217_/boxb.txt"
+bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/VTFI0014_VVI_200_01_09_02_2021_123325_/bpao.txt"
 # bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces1/ADA003_03_12_01_2021_154719_/BP.txt"
 
 DEBUG = False
 
 STEP_SIZE = 200
 BP_LAG = 200
-PERFUSION_LAG = 200
+PERFUSION_LAG = 100
 
 def butter_lowpass(cutoff, fs, order):
     nyq = 0.5 * fs
@@ -79,8 +81,8 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
             print(lag1)
             lag2=abs(egm_end_time-i)
             print(lag2)
-            if abs(lag1-lag2)>300:
-                lag=300
+            if abs(lag1-lag2)>400:
+                lag=400
             else:
                 lag=int(np.mean([lag2,lag1])/2)
 
@@ -174,11 +176,11 @@ class BPDetector:
 
     def detect_new_data(self):
         buffer = self.buffer
-        buffer = (buffer - min(buffer)) / (max(buffer) - min(buffer))
-        window_size = 100
-        window = np.ones(window_size) / float(window_size)
-        out = np.sqrt(np.convolve(buffer, window, 'same'))
-        return out
+        # buffer = (buffer - min(buffer)) / (max(buffer) - min(buffer))
+        # window_size = 100
+        # window = np.ones(window_size) / float(window_size)
+        # out = np.sqrt(np.convolve(buffer, window, 'same'))
+        return buffer
 
 
 def main(electrogram_path, perfusion_path, bp_path, period, decision):
@@ -203,7 +205,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
         p4 = win.addPlot(row=0, col=1)
         p5 = win.addPlot(row=1, col=1)
         p6 = win.addPlot(row=2, col=1)
-        # p7 = win.addPlot(row=0, col=2) .  /
+        p7 = win.addPlot(row=0, col=2)
 
         curve1 = p1.plot()
         dot1 = p1.plot(pen=None, symbol="o")
@@ -217,7 +219,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
         curve9 = p5.plot()
         curve10 = p5.plot()
         curve11 = p6.plot()
-        # curve12 = p7.plot()
+        curve12 = p7.plot()
         dot2 = p2.plot(pen=None, symbol="x")
         dot3 = p2.plot(pen=None, symbol="o")
         dot4 = p4.plot(pen=None, symbol="o")
@@ -279,12 +281,14 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             perfusion_det.load_new_data(perfusion)
             per_out = perfusion_det.detect_new_data()
-            if np.mean(per_out)<1:
+            if np.mean(per_out)<2:
                 per_out=per_out*100
+            # per_out=np.log(per_out)
             bp_det.load_new_data(bpdata)
             bp_out = bp_det.detect_new_data()
-            if np.mean(bp_out)<1:
+            if np.mean(bp_out)<2:
                 bp_out=bp_out*100
+
 
         except Exception as e:
             print("Out of data")
@@ -312,6 +316,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             rr_interval = end_local_time - start_local_time
             bpm_interval = 60000 / rr_interval
+            print("??????????",bpm_interval)
             BP_lag=lag_calc(start_local_time,end_local_time,bp_out)
             mean_bp_interval = np.mean(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
 
@@ -347,9 +352,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             print("end_global_time",end_local_time)
             print("start_global_time",start_local_time)
             print("rr_interval",rr_interval)
-            print(len(per_out[(start_local_time+PERFUSION_lag):(end_local_time+PERFUSION_lag)]))
+            print(len(per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]))
 
-            perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_lag):(end_local_time+PERFUSION_lag)]
+            perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]
             print("perfusion_cut",perfusion_cut)
             mat.appendleft(perfusion_cut)
 
@@ -365,6 +370,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             print(perfusion_sd)
 
             perfusion_consensus[perfusion_consensus_mask] = np.nan
+
             print(perfusion_consensus)
             try:
                 perfusion_consensus_argmax = np.nanargmax(perfusion_consensus)
@@ -379,24 +385,17 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 print(perfusion_consensus_max)
                 print(perfusion_consensus_min)
                 print(perfusion_consensus_argmax)
-                theta = ((perfusion_consensus_max - perfusion_consensus_min) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
+                # theta = ((perfusion_consensus_max - perfusion_consensus_min) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
+                theta = ((perfusion_mean) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
                 print("!!!!!!!!!!!!!!Theta",theta)
                 tmpgrad = math.degrees(math.atan(theta))
+
                 print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad)
                 perSkew = skew(perfusion_consensus_argmax)
                 perKurtosis = kurtosis(perfusion_consensus_argmax)
-                bp_inteerval = int(tmpgrad * perfusion_consensus_argmax * 0.00750062)
-                if bp_inteerval <50:
-                    actual_predictedbp=bp_inteerval
-                    actual_theta=theta
-                    theta = theta *10
-                    tmpgrad = math.degrees(math.atan(theta))
-                    interval_stats.update({"predictedbp":actual_predictedbp,
-                           "actual_theta":actual_theta,
-                           "npargmax":perfusion_consensus_argmax,})
-                    bp_inteerval = int((tmpgrad * perfusion_consensus_argmax * 0.00750062)-perfusion_mean)
-                    if bp_inteerval<40:
-                        bp_inteerval=50
+                bp_inteerval = float(tmpgrad * perfusion_consensus_argmax * 0.00750062)
+                print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
+                bp_inteerval = float((bpm_interval*(tmpgrad))*rr_interval* 0.00750062)
                 print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
             else:
                 bp_inteerval=0
@@ -471,13 +470,13 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
 
         count = count + 1
-        # time.sleep(2)
+        # time.sleep(0.5)
     output=pd.DataFrame(output)
     return output
 
 
 # if __name__ == '__main__':
-#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
+#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
 #     output_pd = pd.DataFrame(output)
 #     output_pd.to_csv("paok.csv")
-#     print("Done")
+    print("Done")
