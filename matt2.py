@@ -10,6 +10,7 @@ from PyQt6 import QtGui
 import pyqtgraph as pg
 import numpy as np
 from scipy.signal import butter, filtfilt, find_peaks, lfilter  # Filter requirements.
+from pickle import load
 from scipy import fftpack
 import time
 
@@ -187,7 +188,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     BP_PATH = bp_path
-
+    model = load(open('model.pkl', 'rb'))
     electrogram = Data_Reader(data_path=ELECTROGRAM_PATH)
     perfusion = Data_Reader(data_path=PERFUSION_PATH)
     bpdata = Data_Reader(data_path=BP_PATH)
@@ -316,14 +317,14 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             rr_interval = end_local_time - start_local_time
             bpm_interval = 60000 / rr_interval
-            print("??????????",bpm_interval)
+            # print("??????????",bpm_interval)
             BP_lag=lag_calc(start_local_time,end_local_time,bp_out)
             mean_bp_interval = np.mean(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
 
-            print("bp lag time",BP_lag)
+            # print("bp lag time",BP_lag)
 
-            print("len bp",len(bp_out))
-            print(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
+            # print("len bp",len(bp_out))
+            # print(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
             max_bp_interval = np.max(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
             min_bp_interval = np.min(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
 
@@ -349,25 +350,25 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             perfusion_cut = np.zeros(2000) * np.nan
             PERFUSION_lag=lag_calc(start_local_time,end_local_time,per_out)
             # print(PERFUSION_lag)
-            print("end_global_time",end_local_time)
-            print("start_global_time",start_local_time)
-            print("rr_interval",rr_interval)
-            print(len(per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]))
+            # print("end_global_time",end_local_time)
+            # print("start_global_time",start_local_time)
+            # print("rr_interval",rr_interval)
+            # print(len(per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]))
 
             perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]
-            print("perfusion_cut",perfusion_cut)
+            # print("perfusion_cut",perfusion_cut)
             mat.appendleft(perfusion_cut)
 
             perfusion_mat = np.array(mat)
-            print("perfusion_mat",perfusion_mat)
+            # print("perfusion_mat",perfusion_mat)
             perfusion_consensus = np.nanmean(perfusion_mat, axis=0)
-            print("perfusion_consensus",perfusion_consensus)
+            # print("perfusion_consensus",perfusion_consensus)
             perfusion_consensus_mask = np.isnan(np.sum(perfusion_mat, axis=0))
-            print(perfusion_consensus_mask)
+            # print(perfusion_consensus_mask)
             perfusion_mean = np.nanmean(perfusion_consensus)
-            print(perfusion_mean)
+            # print(perfusion_mean)
             perfusion_sd = np.nanstd(perfusion_consensus)
-            print(perfusion_sd)
+            # print(perfusion_sd)
 
             perfusion_consensus[perfusion_consensus_mask] = np.nan
 
@@ -376,26 +377,27 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 perfusion_consensus_argmax = np.nanargmax(perfusion_consensus)
             except:
                 continue
-            print(perfusion_consensus_argmax)
+            # print(perfusion_consensus_argmax)
             perfusion_consensus_max = perfusion_consensus[perfusion_consensus_argmax]
-            print(perfusion_consensus_max)
+            # print(perfusion_consensus_max)
             perfusion_consensus_min = perfusion_consensus[0]
-            print(perfusion_consensus_min)
+            # print(perfusion_consensus_min)
             if perfusion_consensus_argmax!=0:
-                print(perfusion_consensus_max)
-                print(perfusion_consensus_min)
-                print(perfusion_consensus_argmax)
+                # print(perfusion_consensus_max)
+                # print(perfusion_consensus_min)
+                # print(perfusion_consensus_argmax)
                 # theta = ((perfusion_consensus_max - perfusion_consensus_min) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
                 theta = ((perfusion_mean) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
-                print("!!!!!!!!!!!!!!Theta",theta)
+                # print("!!!!!!!!!!!!!!Theta",theta)
                 tmpgrad = math.degrees(math.atan(theta))
 
-                print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad)
+                # print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad)
                 perSkew = skew(perfusion_consensus_argmax)
                 perKurtosis = kurtosis(perfusion_consensus_argmax)
-                bp_inteerval = float(tmpgrad * perfusion_consensus_argmax * 0.00750062)
-                print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
-                bp_inteerval = float((bpm_interval*(tmpgrad))*rr_interval* 0.00750062)
+                bp_inteerval = model.predict([[tmpgrad]])[0]
+                # bp_inteerval = float(tmpgrad * perfusion_consensus_argmax * 0.00750062)
+                # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
+                # bp_inteerval = float((bpm_interval*(tmpgrad))*rr_interval* 0.00750062)
                 print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
             else:
                 bp_inteerval=0
@@ -475,8 +477,8 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     return output
 
 
-# if __name__ == '__main__':
-#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
+if __name__ == '__main__':
+    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
     print("Done")

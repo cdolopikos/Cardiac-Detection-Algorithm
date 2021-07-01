@@ -1,27 +1,31 @@
-import numpy as np
-from sklearn.linear_model import LinearRegression
+# load model and scaler and make predictions on new data
+from sklearn.datasets import make_blobs
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+from pickle import load
 import pandas as pd
-from sklearn.preprocessing import PolynomialFeatures
+import numpy as np
+import matplotlib.pyplot as plt
 
-df = pd.read_csv("/Volumes/mc1/test_weka.csv", index_col=False)
-print(df.head(10))
-y = np.array(df["BP"])
-x = np.array(df["LS"]).reshape(-1,1)
+# prepare dataset
+df=pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/idk/cleaned_data.csv")
+# data = df[["Max Actual BP", "Current Perfusion Grad"]]
+x=np.array(df["Current Perfusion Grad"]).reshape(-1,1)[:5000]
+y=df["Max Actual BP"][:5000]
+# load the model
+model = load(open('model.pkl', 'rb'))
+# load the scaler
+count=0
+tmp=[]
+tmp1=[]
+for i in range(len(x)):
+    y_pred = model.predict([x[i]])
+    y_true=y[i]
+    print(y_pred,y[i],x[i])
+    tmp.append(y_pred)
+    tmp1.append(y_true)
 
-transformer = PolynomialFeatures(degree=2, include_bias=False)
-transformer.fit(x)
-x_ = transformer.transform(x)
-x_ = PolynomialFeatures(degree=2, include_bias=False).fit_transform(x)
-print(x_)
-model = LinearRegression().fit(x_, y)
-r_sq = model.score(x_, y)
-
-print('intercept:', model.intercept_)
-print('coefficients:', model.coef_)
-y_pred = model.predict(x_)
-print(len(x))
-print(len(y_pred))
-print('predicted response:', y_pred)
-for i in range(len(y_pred)):
-    print("y_pred",y_pred[i]*100*(abs(model.coef_ + 1)))
-    print("BP",x[i]*100)
+plt.scatter(x, y)
+plt.plot(x, tmp,"r")
+plt.show()
+print("acc",count/len(x))
