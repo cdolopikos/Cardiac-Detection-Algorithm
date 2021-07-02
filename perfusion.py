@@ -15,12 +15,12 @@ from scipy.signal import butter, filtfilt, find_peaks, lfilter  # Filter require
 from scipy import fftpack
 import time
 
-# ELECTROGRAM_PATH = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/Normal/normalbostoncrtd_11_11_2020_144740_/bpao.txt"
-# PERFUSION_PATH = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/Normal/normalbostoncrtd_11_11_2020_144740_/qfin.txt"
+# ELECTROGRAM_PATH = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/normalbostoncrtd_11_11_2020_144740_/bpao.txt"
+# PERFUSION_PATH = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/normalbostoncrtd_11_11_2020_144740_/qfin.txt"
 
 
-PERFUSION_PATH = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Atach_CRTD_21_10_2020_164349_/qfin.txt"
-ELECTROGRAM_PATH = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Atach_CRTD_21_10_2020_164349_/boxb.txt"
+PERFUSION_PATH = "/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/qfin.txt"
+ELECTROGRAM_PATH = "/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/boxb.txt"
 
 
 def butter_lowpass(cutoff, fs, order):

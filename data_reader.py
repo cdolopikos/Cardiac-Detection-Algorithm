@@ -10,21 +10,21 @@ def read_ecg(file_name):
     return genfromtxt(file_name, delimiter=',')
 
 
-# print(read_ecg('/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Atach_CRTD_21_10_2020_164349_/ecg.txt'))
-ecg = read_ecg("/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Atach_CRTD_21_10_2020_164349_/boxb.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/Normal/boston_test01_11_11_2020_140516_/boxa.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/Normal/boston_test01_11_11_2020_140516_/ecg.txt")
+# print(read_ecg('/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/ecg.txt'))
+ecg = read_ecg("/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/boxb.txt")
+    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/boston_test01_11_11_2020_140516_/boxa.txt")
+    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/boston_test01_11_11_2020_140516_/ecg.txt")
     #
-    # '/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Atach_CRTD_21_10_2020_164349_/ecg.txt')
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/Normal/boston_test01_11_11_2020_140516_/ecg.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/Normal/AAD_RVLEADFRACTURE_MB01_27_10_2020_153348_/ecg.txt")
+    # '/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/ecg.txt')
+    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/boston_test01_11_11_2020_140516_/ecg.txt")
+    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/AAD_RVLEADFRACTURE_MB01_27_10_2020_153348_/ecg.txt")
     #
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Atach_CRTD_21_10_2020_164349_/boxa.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Atach_CRTD_21_10_2020_164349_/boxb.txt")
-    #
-    #
+    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/boxa.txt")
+    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/boxb.txt")
     #
     #
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/Normal/AAD_RVLEADFRACTURE_MB01_27_10_2020_153348_/ecg.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/CT Lead noise/ada001_30_07_2020_093706_/ecg.txt")
+    #
+    #
+    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/AAD_RVLEADFRACTURE_MB01_27_10_2020_153348_/ecg.txt")
+    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/CT Lead noise/ada001_30_07_2020_093706_/ecg.txt")
     # )

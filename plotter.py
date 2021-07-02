@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pandas import Series
 
-PERFUSION_PATH = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/A Tach/Atach_CRTD_21_10_2020_164349_/qfin.txt"
+PERFUSION_PATH = "/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/qfin.txt"
 data = pd.read_csv(
-    "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces/Normal/normalbostoncrtd_11_11_2020_144740_/qfin.txt")
+    "/Traces_unzipped_examples/Normal/normalbostoncrtd_11_11_2020_144740_/qfin.txt")
 data = pd.read_csv(PERFUSION_PATH)
 data = data[0:1200]
 data= data.to_numpy()

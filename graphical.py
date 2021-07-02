@@ -6,7 +6,7 @@ import glob, os
 import matplotlib.pyplot as plt
 import numpy as np
 
-path="/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/idk"
+path= "/Preprocessed_data"
 count = 0
 os.chdir(path)
 actual=[]

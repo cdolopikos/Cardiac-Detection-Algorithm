@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-path = os.path.dirname(os.getcwd()) + '/AAD_1/idk/combined_csv.csv'
+path = os.path.dirname(os.getcwd()) + '/AAD_1/Preprocessed_data/combined_csv.csv'
 
 
 # gets preprocessed data from csv and returns a dataframe
