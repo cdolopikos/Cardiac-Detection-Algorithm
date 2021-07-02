@@ -385,8 +385,13 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             # print(perfusion_sd)
 
             perfusion_consensus[perfusion_consensus_mask] = np.nan
+            sim_scores = []
+            for i in mat:
+                similarity = np.sum(np.sqrt(np.power((a-b),2)) for a, b in zip(perfusion_consensus,i))
+                sim_scores.append(similarity)
+            sim_score = np.sum(sim_scores)/len(sim_scores)
 
-            print(perfusion_consensus)
+
             try:
                 perfusion_consensus_argmax = np.nanargmax(perfusion_consensus)
                 perfusion_consensus_argmin = np.nanargmin(perfusion_consensus)
@@ -420,6 +425,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 perKurtosis=0
 
             update_dict = {"BP": bp_inteerval,
+                           "Quality of prfusion":sim_score,
                            "Perfusion Amplitude": perfusion_amplitude,
                            "Current Perfusion Grad": tmpgrad,
                            "Per Mean": perfusion_mean,
@@ -494,8 +500,8 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     return output
 
 
-# if __name__ == '__main__':
-#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
+if __name__ == '__main__':
+    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
 #     print("Done")
