@@ -284,7 +284,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             per_out = perfusion_det.detect_new_data()
             if np.mean(per_out)<2:
                 per_out=per_out*100
-            # per_out=np.log(per_out)
+            per_out=np.log(per_out)
             bp_det.load_new_data(bpdata)
             bp_out = bp_det.detect_new_data()
             if np.mean(bp_out)<2:
@@ -376,19 +376,21 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             try:
                 perfusion_consensus_argmax = np.nanargmax(perfusion_consensus)
                 perfusion_consensus_argmin = np.nanargmin(perfusion_consensus)
+
             except:
                 continue
             # print(perfusion_consensus_argmax)
             perfusion_consensus_max = perfusion_consensus[perfusion_consensus_argmax]
             # print(perfusion_consensus_max)
             perfusion_consensus_min = perfusion_consensus[0]
+            perfusion_consensus_height=abs(perfusion_consensus_max-perfusion_consensus_min)
             # print(perfusion_consensus_min)
             if perfusion_consensus_argmax!=0:
                 print(perfusion_consensus_max)
                 print(perfusion_consensus_min)
                 # print(perfusion_consensus_argmax)
                 # theta = ((perfusion_consensus_max - perfusion_consensus_min) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
-                theta = ((perfusion_consensus_max-perfusion_consensus_min) /abs(PERFUSION_lag + perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
+                theta = ((perfusion_consensus_max-perfusion_consensus_min) / abs(perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
                 # print("!!!!!!!!!!!!!!Theta",theta)
                 tmpgrad = math.degrees(math.atan(theta))
 
@@ -396,9 +398,6 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 perSkew = skew(perfusion_consensus_argmax)
                 perKurtosis = kurtosis(perfusion_consensus_argmax)
                 bp_inteerval = model.predict([[tmpgrad]])[0]
-                # bp_inteerval = float(tmpgrad * perfusion_consensus_argmax * 0.00750062)
-                # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
-                # bp_inteerval = float((bpm_interval*(tmpgrad))*rr_interval* 0.00750062)
                 print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
             else:
                 bp_inteerval=0
@@ -407,6 +406,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 perKurtosis=0
 
             update_dict = {"BP": bp_inteerval,
+                           "perfusion_consensus_max":perfusion_consensus_max,
+                           "perfusion_consensus_height":perfusion_consensus_height,
+                           "perfusion_mean":perfusion_mean,
                            "Current Perfusion Grad": tmpgrad,
                            "Per Mean": perfusion_mean,
                            "Per STD": perfusion_sd,
@@ -416,9 +418,6 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             interval_stats.update(update_dict)
 
             output.append(interval_stats)
-        # except Exception as e:
-        #     print("Out of")
-        #     pass
 
             if not DEBUG:
                 curve1.setData(x=np.arange(len(ecg_out)), y=ecg_out)
@@ -473,13 +472,13 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
 
         count = count + 1
-        # time.sleep(0.5)
+        time.sleep(0.5)
     output=pd.DataFrame(output)
     return output
 
 
-# if __name__ == '__main__':
-#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
-#     print("Done")
+if __name__ == '__main__':
+    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
+    print("Done")
