@@ -89,6 +89,20 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
 
     return lag
 
+def getDecision(theta, theta_threshold,per_amplitude, per_amplitude_threshold,ecg_histroy,bpm_threshold, rr_threshold):
+    tmp=[]
+    for i in ecg_histroy:
+        bpm = i[0]
+        rr_interval = i[1]
+        if bpm < bpm_threshold and rr_interval<rr_threshold:
+            tmp.append(0)
+    if len(tmp)>18:
+        if theta<theta_threshold and per_amplitude<per_amplitude_threshold:
+            decision = 1
+        else:
+            decision =0
+    return decision
+
 
 class Data_Reader:
     def __init__(self, data_path):
@@ -272,7 +286,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     rr_interval = 1000
     finish = 400
     # tmp=[]
-
+    ecg_data = [None] * 20
     while True:
         # print(f"count: {count}")
         # Setting up the data instreams
@@ -382,13 +396,12 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             perfusion_consensus_max = perfusion_consensus[perfusion_consensus_argmax]
             # print(perfusion_consensus_max)
             perfusion_consensus_min = perfusion_consensus[0]
+            perfusion_amplitude = perfusion_consensus_max-perfusion_consensus_min
             # print(perfusion_consensus_min)
             if perfusion_consensus_argmax!=0:
                 print(perfusion_consensus_max)
                 print(perfusion_consensus_min)
-                # print(perfusion_consensus_argmax)
-                # theta = ((perfusion_consensus_max - perfusion_consensus_min) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
-                theta = ((perfusion_consensus_max-perfusion_consensus_min) /abs(PERFUSION_lag + perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
+                theta = ((perfusion_consensus_max-perfusion_consensus_min) /abs(perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
                 # print("!!!!!!!!!!!!!!Theta",theta)
                 tmpgrad = math.degrees(math.atan(theta))
 
@@ -407,6 +420,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 perKurtosis=0
 
             update_dict = {"BP": bp_inteerval,
+                           "Perfusion Amplitude": perfusion_amplitude,
                            "Current Perfusion Grad": tmpgrad,
                            "Per Mean": perfusion_mean,
                            "Per STD": perfusion_sd,
@@ -414,7 +428,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                            "Per Kurtosis": perKurtosis}
 
             interval_stats.update(update_dict)
-
+            ecg_data.append([bpm_interval,rr_interval])
+            # todo
+            # my_decision = getDecision(bpm=bpm_interval,rr_interval=rr_interval)
             output.append(interval_stats)
         # except Exception as e:
         #     print("Out of")
