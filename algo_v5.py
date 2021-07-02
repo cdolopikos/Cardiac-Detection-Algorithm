@@ -285,7 +285,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision,name):
             per_out = perfusion_det.detect_new_data()
             if np.mean(per_out)<2:
                 per_out=per_out*100
-            per_out=np.log(per_out)
+            # per_out=np.log(per_out)
             bp_det.load_new_data(bpdata)
             bp_out = bp_det.detect_new_data()
             if np.mean(bp_out)<2:
@@ -328,7 +328,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision,name):
             # print(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
             max_bp_interval = np.max(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
             min_bp_interval = np.min(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
-
+            percentage_change = ((max_bp_interval-min_bp_interval)/max_bp_interval)*100
             egmMean_interval = np.mean(ecg_out[start_local_time:end_local_time])
             egmSTD_interval = np.std(ecg_out[start_local_time:end_local_time])
             egmSkew_interval = skew(ecg_out[start_local_time:end_local_time])
@@ -337,6 +337,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision,name):
             interval_stats = stats.copy()
 
             update_dict = {"Max Actual BP": max_bp_interval,
+                           "Percentage change of":percentage_change,
                            "Mean Actual BP": mean_bp_interval,
                            "BPM": bpm_interval,
                            "EGM Mean RV": egmMean_interval,
@@ -391,9 +392,10 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision,name):
                 print(perfusion_consensus_min)
                 # print(perfusion_consensus_argmax)
                 # theta = ((perfusion_consensus_max - perfusion_consensus_min) /abs(PERFUSION_lag+ perfusion_consensus_argmax)) *10
-                theta = ((perfusion_consensus_max-perfusion_consensus_min) / abs(perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
+                # theta = ((perfusion_consensus_max-perfusion_consensus_min) / abs(perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
+                tmpgrad = ((perfusion_consensus_max-perfusion_consensus_min) / abs(perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
                 # print("!!!!!!!!!!!!!!Theta",theta)
-                tmpgrad = math.degrees(math.atan(theta))
+                # tmpgrad = math.degrees(math.atan(theta))
 
                 # print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad)
                 perSkew = skew(perfusion_consensus_argmax)
@@ -476,9 +478,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision,name):
         count = count + 1
         # time.sleep(0.5)
     output=pd.DataFrame(output)
-    plt.scatter(output["Max Actual BP"],output["Current Perfusion Grad"])
-    plt.xlabel("Max actual BP (mmHg)")
-    plt.ylabel("Perfusion gradient log(degrees)")
+    plt.scatter(output["Percentage change of"],output["Current Perfusion Grad"])
+    plt.xlabel("Percentage change of")
+    plt.ylabel("Perfusion gradient")
     plt.title(name)
     # plt.show()
     plt.savefig("/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/bp_vs_grad_images/"+name+".png")
