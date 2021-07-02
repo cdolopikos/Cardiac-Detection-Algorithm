@@ -121,7 +121,7 @@ database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/database.csv")
 # # print(database.columns)
 # for i in database["File"]:
 #     path="/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/"+i
-path= "/Traces_zipped"
+path= "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped"
 count = 0
 os.chdir(path)
 # for file in glob.glob("*"):
@@ -180,7 +180,7 @@ for f in glob.glob("*"):
                     label = 3
                 elif "NSR" in period:
                     label =1
-                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=period, decision=label)
+                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=period, decision=label,name=str(flname)+str(period))
 
                 print(out)
                 csv="/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Preprocessed_data/out"+str(flname)+str(period)+".csv"
@@ -243,7 +243,7 @@ for f in glob.glob("*"):
                 elif "NSR" in period:
                     label =4
                 print(pd.read_csv("ldrv.txt"))
-                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=period, decision=label)
+                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=period, decision=label, name=str(flname)+str(period))
                 csv = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Preprocessed_data/out" + str(flname) + str(
                     period) + ".csv"
                 # out.to_csv(os.get(),index=False, encoding='utf-8-sig')

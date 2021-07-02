@@ -12,6 +12,7 @@ import numpy as np
 from scipy.signal import butter, filtfilt, find_peaks, lfilter  # Filter requirements.
 from pickle import load
 from scipy import fftpack
+import matplotlib.pyplot as plt
 import time
 
 # pp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Haem/Atach_CRTD_21_10_2020_164349_/qfin.txt"
@@ -184,7 +185,7 @@ class BPDetector:
         return buffer
 
 
-def main(electrogram_path, perfusion_path, bp_path, period, decision):
+def main(electrogram_path, perfusion_path, bp_path, period, decision,name):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     BP_PATH = bp_path
@@ -419,6 +420,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             output.append(interval_stats)
 
+
             if not DEBUG:
                 curve1.setData(x=np.arange(len(ecg_out)), y=ecg_out)
                 curve3.setData(x=np.arange(len(raw)), y=raw)
@@ -472,13 +474,20 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
 
         count = count + 1
-        time.sleep(0.5)
+        # time.sleep(0.5)
     output=pd.DataFrame(output)
+    plt.scatter(output["Max Actual BP"],output["Current Perfusion Grad"])
+    plt.xlabel("Max actual BP (mmHg)")
+    plt.ylabel("Perfusion gradient log(degrees)")
+    plt.title(name)
+    # plt.show()
+    plt.savefig("/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/bp_vs_grad_images/"+name+".png")
+    plt.close()
     return output
 
 
-if __name__ == '__main__':
-    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
-    output_pd = pd.DataFrame(output)
-    output_pd.to_csv("paok.csv")
+# if __name__ == '__main__':
+#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1,name="fast")
+#     output_pd = pd.DataFrame(output)
+#     output_pd.to_csv("paok.csv")
     print("Done")
