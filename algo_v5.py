@@ -331,6 +331,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             rr_interval = end_local_time - start_local_time
             bpm_interval = 60000 / rr_interval
+            # problem
             # print("??????????",bpm_interval)
             BP_lag=lag_calc(start_local_time,end_local_time,bp_out)
             mean_bp_interval = np.mean(bp_out[(start_local_time+BP_lag):(end_local_time+BP_lag)])
