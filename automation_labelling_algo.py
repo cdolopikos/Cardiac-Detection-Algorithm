@@ -121,7 +121,7 @@ database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/database.csv")
 # # print(database.columns)
 # for i in database["File"]:
 #     path="/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/"+i
-path= "/Traces_zipped"
+path= "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped"
 count = 0
 os.chdir(path)
 # for file in glob.glob("*"):
@@ -140,7 +140,6 @@ for f in glob.glob("*"):
     if df.empty:
         continue
     else:
-
         if len(df)<=1:
             for i in range(len(df)):
                 if  isinstance(df.iloc[i].loc["LeadRV"], str):
@@ -162,7 +161,7 @@ for f in glob.glob("*"):
                 ldrv=(zf.open(leadRV))
                 # ldrv=pd.read_csv(zf.open(leadRV))
                 lsr1=(zf.open(laser1))
-                print((lsr1))
+                # print((lsr1))
                 # lsr1=pd.read_csv(zf.open(laser1))
                 # blood_pressure=pd.read_csv(zf.open(bp))
                 blood_pressure=(zf.open(bp))
@@ -182,7 +181,7 @@ for f in glob.glob("*"):
                     label =1
                 out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=period, decision=label)
 
-                print(out)
+                # print(out)
                 csv="/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Preprocessed_data/out"+str(flname)+str(period)+".csv"
                 # out.to_csv(os.get(),index=False, encoding='utf-8-sig')
                 out.to_csv(csv, index=False)
@@ -196,7 +195,7 @@ for f in glob.glob("*"):
                         leadRV=str(df.iloc[i].loc["LeadShock"])+".txt"
                     else:
                         leadRV = str(df.iloc[i].loc["ECG"]) + ".txt"
-                print(leadRV)
+                # print(leadRV)
                 period = df.iloc[i].loc["Period"]
                 bp = df.iloc[i].loc["BP"]
                 laser1 = df.iloc[i].loc["Laser1"]
@@ -204,15 +203,17 @@ for f in glob.glob("*"):
                     continue
                 if not isinstance(laser1, str):
                     continue
-                if isinstance(df.iloc[i].loc["Begin"], int):
-                    begin=int(df.iloc[i].loc["Begin"])
-                else:
-                    begin=0
-                if isinstance(df.iloc[i].loc["End"],int):
-                    end = int(df.iloc[i].loc["End"])
-                else:
-                    end=len(pd.read_csv(zf.open(leadRV)))
-                print(end)
+                # if isinstance(df.iloc[i].loc["Begin"], int):
+                begin=int(df.iloc[i].loc["Begin"])
+                # if isinstance(begin)
+                #     begin=0
+                print("BEGIN",begin)
+                # if isinstance(df.iloc[i].loc["End"],int):
+                end = int(df.iloc[i].loc["End"])
+                # else:
+                #     end=len(pd.read_csv(zf.open(leadRV)))
+                print("END", end)
+                # print(end)
                 bp = str(bp) + ".txt"
                 laser1 = str(laser1) + ".txt"
 
@@ -242,10 +243,11 @@ for f in glob.glob("*"):
                     label = 3
                 elif "NSR" in period:
                     label =4
-                print(pd.read_csv("ldrv.txt"))
+                # print(pd.read_csv("ldrv.txt"))
                 out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=period, decision=label)
                 csv = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Preprocessed_data/out" + str(flname) + str(
                     period) + ".csv"
+                print("SHAPE",out.shape)
                 # out.to_csv(os.get(),index=False, encoding='utf-8-sig')
                 out.to_csv(csv, index=False)
 

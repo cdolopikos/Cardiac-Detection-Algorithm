@@ -79,9 +79,9 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
     for i in min_per_peaks:
         if egm_start_time<=i<=egm_end_time:
             lag1=abs(egm_start_time-i)
-            print(lag1)
+            # print(lag1)
             lag2=abs(egm_end_time-i)
-            print(lag2)
+            # print(lag2)
             if abs(lag1-lag2)>400:
                 lag=400
             else:
@@ -306,7 +306,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
 
         except Exception as e:
-            print("Out of data")
+            # print("Out of data")
             break
         # try:
         # EGM Peak detection
@@ -331,6 +331,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             rr_interval = end_local_time - start_local_time
             bpm_interval = 60000 / rr_interval
+
+
+
             # problem
             # print("??????????",bpm_interval)
             BP_lag=lag_calc(start_local_time,end_local_time,bp_out)
@@ -387,10 +390,17 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             perfusion_consensus[perfusion_consensus_mask] = np.nan
             sim_scores = []
-            for i in mat:
-                similarity = np.sum(np.sqrt(np.power((a-b),2)) for a, b in zip(perfusion_consensus,i))
-                sim_scores.append(similarity)
-            sim_score = np.sum(sim_scores)/len(sim_scores)
+            # for i in mat:
+            #     for a in range(len(perfusion_consensus)):
+            #         if not np.isnan(perfusion_consensus[a]) and not np.isnan(i[a]):
+                        # similarity = np.sqrt(np.power((np.isnan(perfusion_consensus[a])-np.isnan(i[a]),2)))
+
+                # similarity = np.nansum(np.sqrt(np.power((a-b),2)) for a, b in zip(perfusion_consensus,i))
+                # sim_scores.append(similarity)
+            # sim_score = np.nansum(sim_scores)
+                        # /len(sim_scores)
+
+            # print("!!!!!!!!!!!!!!!!",sim_score)
 
 
             try:
@@ -405,8 +415,8 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             perfusion_amplitude = perfusion_consensus_max-perfusion_consensus_min
             # print(perfusion_consensus_min)
             if perfusion_consensus_argmax!=0:
-                print(perfusion_consensus_max)
-                print(perfusion_consensus_min)
+                # print(perfusion_consensus_max)
+                # print(perfusion_consensus_min)
                 theta = ((perfusion_consensus_max-perfusion_consensus_min) /abs(perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
                 # print("!!!!!!!!!!!!!!Theta",theta)
                 tmpgrad = math.degrees(math.atan(theta))
@@ -418,7 +428,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 # bp_inteerval = float(tmpgrad * perfusion_consensus_argmax * 0.00750062)
                 # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
                 # bp_inteerval = float((bpm_interval*(tmpgrad))*rr_interval* 0.00750062)
-                print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
+                # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
             else:
                 bp_inteerval=0
                 tmpgrad=0
@@ -426,7 +436,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 perKurtosis=0
 
             update_dict = {"BP": bp_inteerval,
-                           "Quality of prfusion":sim_score,
+                           # "Quality of prfusion":sim_score,
                            "Perfusion Amplitude": perfusion_amplitude,
                            "Current Perfusion Grad": tmpgrad,
                            "Per Mean": perfusion_mean,
@@ -497,12 +507,19 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
         count = count + 1
         # time.sleep(0.5)
+    if 0<bpm_interval<50:
+        print(start_local_time)
+        print(start_global_time)
+        print(end_local_time)
+        print(end_global_time)
+        print(bpm_interval)
+        time.sleep(60)
     output=pd.DataFrame(output)
     return output
 
-
-if __name__ == '__main__':
-    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
-    output_pd = pd.DataFrame(output)
-    output_pd.to_csv("paok.csv")
+#
+# if __name__ == '__main__':
+#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
+#     output_pd = pd.DataFrame(output)
+#     output_pd.to_csv("paok.csv")
 #     print("Done")
