@@ -390,17 +390,17 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             perfusion_consensus[perfusion_consensus_mask] = np.nan
             sim_scores = []
-            # for i in mat:
-            #     for a in range(len(perfusion_consensus)):
-            #         if not np.isnan(perfusion_consensus[a]) and not np.isnan(i[a]):
-                        # similarity = np.sqrt(np.power((np.isnan(perfusion_consensus[a])-np.isnan(i[a]),2)))
+            for i in mat:
+                for a in range(len(perfusion_consensus)):
+                    if not np.isnan(perfusion_consensus[a]) and not np.isnan(i[a]):
+                        dif=np.power(perfusion_consensus[a],2)-np.power(i[a],2)
+                        similarity = np.sqrt(dif)
 
                 # similarity = np.nansum(np.sqrt(np.power((a-b),2)) for a, b in zip(perfusion_consensus,i))
-                # sim_scores.append(similarity)
-            # sim_score = np.nansum(sim_scores)
-                        # /len(sim_scores)
+                        sim_scores.append(similarity)
+            sim_score = np.nansum(sim_scores)/len(sim_scores)
 
-            # print("!!!!!!!!!!!!!!!!",sim_score)
+            print("!!!!!!!!!!!!!!!!",sim_score)
 
 
             try:

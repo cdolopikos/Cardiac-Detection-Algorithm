@@ -121,7 +121,7 @@ database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/database.csv")
 # # print(database.columns)
 # for i in database["File"]:
 #     path="/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/"+i
-path= "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped"
+path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped"
 count = 0
 os.chdir(path)
 # for file in glob.glob("*"):
@@ -157,7 +157,7 @@ for f in glob.glob("*"):
                 # leadShock=str(leadShock)+".txt"
                 bp=str(bp)+".txt"
                 laser1=str(laser1)+".txt"
-                zf = zipfile.ZipFile("/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/"+str(f))
+                zf = zipfile.ZipFile("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/"+str(f))
                 ldrv=(zf.open(leadRV))
                 # ldrv=pd.read_csv(zf.open(leadRV))
                 lsr1=(zf.open(laser1))
@@ -187,7 +187,7 @@ for f in glob.glob("*"):
                 out.to_csv(csv, index=False)
         else:
             for i in range(len(df)):
-                zf = zipfile.ZipFile("/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/" + str(f))
+                zf = zipfile.ZipFile("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/" + str(f))
                 if  isinstance(df.iloc[i].loc["LeadRV"], str):
                     leadRV = str(df.iloc[i].loc["LeadRV"])+".txt"
                 else:
