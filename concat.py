@@ -2,7 +2,7 @@ import os
 import glob
 import pandas as pd
 def concat():
-    os.chdir("/Preprocessed_data")
+    os.chdir("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data")
     cwd = os.getcwd()
     print(cwd)
     extension = 'csv'
@@ -15,4 +15,6 @@ def concat():
     #     print(f)
     #     pd.read_csv(f)
     #export to csv
-    combined_csv.to_csv( "combined_csv.csv", index=False, encoding='utf-8-sig')
+    combined_csv.to_csv( "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv", index=False, encoding='utf-8-sig')
+
+concat()

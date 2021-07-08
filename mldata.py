@@ -5,8 +5,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-path = os.path.dirname(os.getcwd()) + '/AAD_1/Preprocessed_data/combined_csv.csv'
-
+# path = os.path.dirname(os.getcwd()) + '/AAD_1/Preprocessed_data/combined_csv.csv'
+# path = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/paok.csv"
+path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv"
 
 # gets preprocessed data from csv and returns a dataframe
 def setData(pth):
