@@ -166,19 +166,19 @@ for f in glob.glob("*"):
                 # blood_pressure=pd.read_csv(zf.open(bp))
                 blood_pressure=(zf.open(bp))
                 if "Noise" in period:
-                    label=0
+                    label=1
                 elif "Normal" in period:
-                    label=1
+                    label=0
                 elif "Baseline" in period:
-                    label=1
+                    label=0
                 elif "VVI" in period:
-                    label=2
+                    label=3
                 elif "AAI" in period:
-                    label=2
+                    label=3
                 elif "Slow" in period:
-                    label = 3
+                    label = 2
                 elif "NSR" in period:
-                    label =1
+                    label =0
                 out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=period, decision=label)
 
                 # print(out)

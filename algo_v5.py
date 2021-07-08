@@ -53,20 +53,6 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
 
     return lag
 
-def getDecision(theta, theta_threshold,per_amplitude, per_amplitude_threshold,ecg_histroy,bpm_threshold, rr_threshold):
-    tmp=[]
-    for i in ecg_histroy:
-        bpm = i[0]
-        rr_interval = i[1]
-        if bpm < bpm_threshold and rr_interval<rr_threshold:
-            tmp.append(0)
-    if len(tmp)>18:
-        if theta<theta_threshold and per_amplitude<per_amplitude_threshold:
-            decision = 1
-        else:
-            decision =0
-    return decision
-
 
 
 def main(electrogram_path, perfusion_path, bp_path, period, decision):
