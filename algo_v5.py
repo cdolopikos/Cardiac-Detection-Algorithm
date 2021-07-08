@@ -132,8 +132,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     cons = []
     output = []
 
-    stats = {"Beats per Second (1000ms)": 0,
-             "BPM": 0,
+    stats = {"BPM": 0,
              "EGM Mean RV": 0,
              "EGM STD RV": 0,
              "EGM Skewness RV": 0,
@@ -147,6 +146,8 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
              "Per Skewness": 0,
              "Per Kurtosis": 0,
              "Current Perfusion Grad": 0,
+             "Quality of Perfusion":0,
+             "Perfusion Amplitude":0,
              # "Per Cum. Mean": 0,
              # "Per Cum. STD": 0,
              # "Per Cum. Skewness": 0,
@@ -286,6 +287,12 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             # print(perfusion_consensus_max)
             perfusion_consensus_min = perfusion_consensus[0]
             perfusion_amplitude = perfusion_consensus_max-perfusion_consensus_min
+            per_cons=[]
+            for p in perfusion_consensus:
+                if not np.isnan(p):
+                    per_cons.append(p)
+            perSkew = skew(per_cons)
+            perKurtosis = kurtosis(per_cons)
             # print(perfusion_consensus_min)
             if perfusion_consensus_argmax!=0:
                 # print(perfusion_consensus_max)
@@ -294,9 +301,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 # print("!!!!!!!!!!!!!!Theta",theta)
                 tmpgrad = math.degrees(math.atan(theta))
 
-                # print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad)
-                perSkew = skew(perfusion_consensus_argmax)
-                perKurtosis = kurtosis(perfusion_consensus_argmax)
+                # print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad
                 bp_inteerval = model.predict([[tmpgrad]])[0]
                 # bp_inteerval = float(tmpgrad * perfusion_consensus_argmax * 0.00750062)
                 # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
@@ -305,11 +310,10 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             else:
                 bp_inteerval=0
                 tmpgrad=0
-                perSkew=0
-                perKurtosis=0
+
 
             update_dict = {"BP": bp_inteerval,
-                           "Quality of prfusion":sim_score,
+                           "Quality of Perfusion":sim_score,
                            "Perfusion Amplitude": perfusion_amplitude,
                            "Current Perfusion Grad": tmpgrad,
                            "Per Mean": perfusion_mean,
@@ -388,6 +392,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     #     print(bpm_interval)
     #     time.sleep(60)
     output=pd.DataFrame(output)
+    output=output.iloc[1: , :]
     return output
 
 #
