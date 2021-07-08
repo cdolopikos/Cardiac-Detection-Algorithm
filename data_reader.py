@@ -1,30 +1,20 @@
-# ## detect QRS complex from ECG time series
-
 import numpy as np
-import math
-from numpy import genfromtxt
-import matplotlib.pyplot as plt
 
+class Data_Reader:
+    def __init__(self, data_path):
+        self.data_path = data_path
+        self.data = self.read_data(self.data_path)
+        self.data_len = len(self.data)
+        self.data_index = 0
 
-def read_ecg(file_name):
-    return genfromtxt(file_name, delimiter=',')
+    # reads data
+    def read_data(self, file_name):
+        return np.genfromtxt(file_name, delimiter=',')
 
-
-# print(read_ecg('/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/ecg.txt'))
-ecg = read_ecg("/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/boxb.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/boston_test01_11_11_2020_140516_/boxa.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/boston_test01_11_11_2020_140516_/ecg.txt")
-    #
-    # '/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/ecg.txt')
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/boston_test01_11_11_2020_140516_/ecg.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/AAD_RVLEADFRACTURE_MB01_27_10_2020_153348_/ecg.txt")
-    #
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/boxa.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Atach_CRTD_21_10_2020_164349_/boxb.txt")
-    #
-    #
-    #
-    #
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/Normal/AAD_RVLEADFRACTURE_MB01_27_10_2020_153348_/ecg.txt")
-    # "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/CT Lead noise/ada001_30_07_2020_093706_/ecg.txt")
-    # )
+    # gets next 200ms
+    def get_next_data(self, amount=200):
+        if self.data_index + amount < self.data_len:
+            self.data_index = self.data_index + amount
+            return self.data[self.data_index: self.data_index + amount]
+        else:
+            raise Exception

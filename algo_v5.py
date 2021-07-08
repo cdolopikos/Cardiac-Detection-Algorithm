@@ -11,6 +11,7 @@ import pyqtgraph as pg
 import numpy as np
 from scipy.signal import butter, filtfilt, find_peaks, lfilter  # Filter requirements.
 from pickle import load
+import filters, data_reader, perfusion_detector, bp_detector,electrogram_detector
 from scipy import fftpack
 import time
 
@@ -19,57 +20,20 @@ import time
 # bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/vfi0017_vvi180_01_27_04_2021_152246_/boxb.txt"
 
 # pp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/VTFI0014_VVI_200_01_09_02_2021_123325_/BP.txt"
-pp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/ADA003_03_12_01_2021_154719_/plethh.txt"
+pp = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/ADA003_03_12_01_2021_154719_/plethh.txt"
 # ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/vtfi0017_test_aai_his_27_04_2021_150217_/BP.txt"
 # ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/VTFI0014_VVI_200_01_09_02_2021_123325_/ecg.txt"
-ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/ADA003_03_12_01_2021_154719_/plethg.txt"
+ee = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/ADA003_03_12_01_2021_154719_/plethg.txt"
 # ee1 = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/ADA003_03_12_01_2021_154719_/plethg.txt"
 # bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/vtfi0017_test_aai_his_27_04_2021_150217_/boxb.txt"
 # bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/VTFI0014_VVI_200_01_09_02_2021_123325_/bpao.txt"
-bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/ADA003_03_12_01_2021_154719_/BP.txt"
+bpp = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/ADA003_03_12_01_2021_154719_/BP.txt"
 
 DEBUG = False
 
 STEP_SIZE = 200
 BP_LAG = 200
 PERFUSION_LAG = 100
-
-def butter_lowpass(cutoff, fs, order):
-    nyq = 0.5 * fs
-    normal_cutoff = cutoff / nyq
-    b, a = butter(order, normal_cutoff, btype='low', analog=False)
-    return b, a
-
-
-def butter_lowpass_filter(data, cutoff, fs, order):
-    b, a = butter_lowpass(cutoff, fs, order=order)
-    y = lfilter(b, a, data)
-    return y
-
-
-def butter_highpass(cutoff, fs, order):
-    nyq = 0.5 * fs
-    normal_cutoff = cutoff / nyq
-    b1, a1 = butter(order, normal_cutoff, btype='high', analog=False)
-    return b1, a1
-
-
-def butter_highpass_filter(data, cutoff, fs, order):
-    b1, a1 = butter_highpass(cutoff, fs, order=order)
-    y1 = filtfilt(b1, a1, data)
-    return y1
-
-
-def dynamic_smoothing(x):
-    start_window_length = len(x) // 2
-    smoothed = []
-    for i in range(len(x)):
-        a = float(i) / len(x)
-        w = int(np.round(a * start_window_length + (1.0 - a)))
-        w0 = max(0, i - w)
-        w1 = min(len(x), i + w)
-        smoothed.append(sum(x[w0:w1]) / (w1 - w0))
-    return np.array(smoothed)
 
 def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
     promper = statistics.mean(signal_with_lag)
@@ -104,112 +68,20 @@ def getDecision(theta, theta_threshold,per_amplitude, per_amplitude_threshold,ec
     return decision
 
 
-class Data_Reader:
-    def __init__(self, data_path):
-        self.data_path = data_path
-        self.data = self.read_data(self.data_path)
-        self.data_len = len(self.data)
-        self.data_index = 0
-
-    # reads data
-    def read_data(self, file_name):
-        return np.genfromtxt(file_name, delimiter=',')
-
-    # gets next 200ms
-    def get_next_data(self, amount=200):
-        if self.data_index + amount < self.data_len:
-            self.data_index = self.data_index + amount
-            return self.data[self.data_index: self.data_index + amount]
-        else:
-            raise Exception
-
-
-class ElectrogramDetector:
-    def __init__(self):
-        self.buffer = np.zeros(2000)
-        self.T = 1.2  # Sample Period
-        self.fs = 1000.0  # sample rate, Hz
-        self.cutoff = 20  # desired cutoff frequency of the filter, Hz ,      slightly higher than actual 1.2 Hz
-        self.nyq = 0.5 * self.fs  # Nyquist Frequency
-        self.order = 3  # sin wave can be approx represented as quadratic
-        self.n = int(self.T * self.fs)
-        self.detected_qrs = []
-
-    def load_new_data(self, electrogram: Data_Reader):
-        self.buffer[0:1800] = self.buffer[200:2000]
-        self.buffer[1800:2000] = electrogram.get_next_data(amount=200)
-
-    def detect_new_data(self):
-        buffer = self.buffer
-        out = butter_lowpass_filter(data=buffer, cutoff=self.cutoff, fs=self.fs, order=self.order)
-        out = butter_highpass_filter(data=out, cutoff=self.cutoff, fs=self.fs, order=self.order)
-        out_mean = np.mean(out)
-        out = np.abs(out - out_mean)
-        out = np.convolve(out, np.ones(111, dtype=np.int), 'same')
-        raw = buffer[100:]
-        return out, raw
-
-
-class PerfusionDetector:
-    def __init__(self):
-        self.buffer = np.zeros(2000)
-        self.T = 1.2  # Sample Period
-        self.fs = 1000.0  # sample rate, Hz
-        self.cutoff = 150  # desired cutoff frequency of the filter, Hz ,      slightly higher than actual 1.2 Hz
-        self.nyq = 0.5 * self.fs  # Nyquist Frequency
-        self.order = 3  # sin wave can be approx represented as quadratic
-        self.n = int(self.T * self.fs)
-        self.detected_qrs = []
-
-    def load_new_data(self, perfusion: Data_Reader):
-        self.buffer[0:1800] = self.buffer[200:2000]
-        self.buffer[1800:2000] = perfusion.get_next_data(amount=200)
-
-    def detect_new_data(self):
-        buffer = self.buffer
-        buffer = (buffer - min(buffer)) / (max(buffer) - min(buffer))
-        window_size = 100
-        window = np.ones(window_size) / float(window_size)
-        out = np.sqrt(np.convolve(buffer, window, 'same'))
-        return out
-
-
-class BPDetector:
-    def __init__(self):
-        self.buffer = np.zeros(2000)
-        self.T = 1.2  # Sample Period
-        self.fs = 1000.0  # sample rate, Hz
-        self.cutoff = 150  # desired cutoff frequency of the filter, Hz ,      slightly higher than actual 1.2 Hz
-        self.nyq = 0.5 * self.fs  # Nyquist Frequency
-        self.order = 3  # sin wave can be approx represented as quadratic
-        self.n = int(self.T * self.fs)
-        self.detected_qrs = []
-
-    def load_new_data(self, bp: Data_Reader):
-        self.buffer[0:1800] = self.buffer[200:2000]
-        self.buffer[1800:2000] = bp.get_next_data(amount=200)
-
-    def detect_new_data(self):
-        buffer = self.buffer
-        # buffer = (buffer - min(buffer)) / (max(buffer) - min(buffer))
-        # window_size = 100
-        # window = np.ones(window_size) / float(window_size)
-        # out = np.sqrt(np.convolve(buffer, window, 'same'))
-        return buffer
-
 
 def main(electrogram_path, perfusion_path, bp_path, period, decision):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     BP_PATH = bp_path
     model = load(open('/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/model.pkl', 'rb'))
-    electrogram = Data_Reader(data_path=ELECTROGRAM_PATH)
-    perfusion = Data_Reader(data_path=PERFUSION_PATH)
-    bpdata = Data_Reader(data_path=BP_PATH)
+    electrogram = data_reader.Data_Reader(data_path=ELECTROGRAM_PATH)
+    perfusion = data_reader.Data_Reader(data_path=PERFUSION_PATH)
+    bpdata = data_reader.Data_Reader(data_path=BP_PATH)
 
-    electrogram_detector = ElectrogramDetector()
-    perfusion_det = PerfusionDetector()
-    bp_det = BPDetector()
+    electrogram_det = electrogram_detector.ElectrogramDetector()
+    perfusion_det = perfusion_detector.PerfusionDetector()
+    bp_det = bp_detector.BPDetector()
+
 
     if not DEBUG:
         win = pg.GraphicsWindow()
@@ -291,8 +163,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
         # print(f"count: {count}")
         # Setting up the data instreams
         try:
-            electrogram_detector.load_new_data(electrogram)
-            ecg_out, raw = electrogram_detector.detect_new_data()
+            # electrogram_det.load_new_data(electrogram)
+            electrogram_det.load_new_data(electrogram=electrogram)
+            ecg_out, raw = electrogram_det.detect_new_data()
 
             perfusion_det.load_new_data(perfusion)
             per_out = perfusion_det.detect_new_data()
@@ -436,7 +309,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 perKurtosis=0
 
             update_dict = {"BP": bp_inteerval,
-                           # "Quality of prfusion":sim_score,
+                           "Quality of prfusion":sim_score,
                            "Perfusion Amplitude": perfusion_amplitude,
                            "Current Perfusion Grad": tmpgrad,
                            "Per Mean": perfusion_mean,
@@ -507,19 +380,19 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
         count = count + 1
         # time.sleep(0.5)
-    if 0<bpm_interval<50:
-        print(start_local_time)
-        print(start_global_time)
-        print(end_local_time)
-        print(end_global_time)
-        print(bpm_interval)
-        time.sleep(60)
+    # if 0<bpm_interval<50:
+    #     print(start_local_time)
+    #     print(start_global_time)
+    #     print(end_local_time)
+    #     print(end_global_time)
+    #     print(bpm_interval)
+    #     time.sleep(60)
     output=pd.DataFrame(output)
     return output
 
 #
-# if __name__ == '__main__':
-#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
+if __name__ == '__main__':
+    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
 #     print("Done")

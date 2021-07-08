@@ -182,7 +182,7 @@ for f in glob.glob("*"):
                 out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=period, decision=label)
 
                 # print(out)
-                csv="/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Preprocessed_data/out"+str(flname)+str(period)+".csv"
+                csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out"+str(flname)+str(period)+".csv"
                 # out.to_csv(os.get(),index=False, encoding='utf-8-sig')
                 out.to_csv(csv, index=False)
         else:
@@ -245,7 +245,7 @@ for f in glob.glob("*"):
                     label =4
                 # print(pd.read_csv("ldrv.txt"))
                 out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=period, decision=label)
-                csv = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Preprocessed_data/out" + str(flname) + str(
+                csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out" + str(flname) + str(
                     period) + ".csv"
                 print("SHAPE",out.shape)
                 # out.to_csv(os.get(),index=False, encoding='utf-8-sig')
