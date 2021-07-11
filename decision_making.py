@@ -1,16 +1,27 @@
-import mldata, multilayerperceptron
+# import mldata, multilayerperceptron
 from pickle import load
+import pandas as pd
+import numpy as np
 
 # mlp = load(open('mlp.pkl', 'rb'))
 # mlp.predict()
+from sklearn.preprocessing import StandardScaler
+
+data = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/testing_combined_csv.csv")
+print(data.head(5))
+print(data.columns)
+dt = data.iloc[:, 0:(len(data.columns) - 1)]
+label = data['Decision']
+print(label)
 
 def getRuleBasedDecision(theta, theta_threshold,per_amplitude, per_amplitude_threshold,ecg_histroy,bpm_threshold, rr_threshold):
     tmp=[]
     for i in ecg_histroy:
-        bpm = i[0]
-        rr_interval = i[1]
-        if bpm < bpm_threshold and rr_interval<rr_threshold:
-            tmp.append(0)
+        if i != 0:
+            bpm = i[0]
+            rr_interval = i[1]
+            if bpm < bpm_threshold and rr_interval<rr_threshold:
+                tmp.append(0)
     if len(tmp)>=18:
         ecg_based_decision = "shock"
     elif 15<len(tmp)<18:
@@ -62,3 +73,29 @@ def cumulative_decsion(mlp_based_decision,ecgbased):
         ecg_based_decision = 1
     decision = mlp_based_decision * ecg_based_decision
     return decision
+
+
+ecg_history=[0]*20
+results=[]
+for i in range(len(data)):
+    print(dt.iloc[i]["Per Mean"])
+    # print()
+    theta=dt.iloc[i]["Current Perfusion Grad"]
+    per_amplitude =dt.iloc[i]["Perfusion Amplitude"]
+    x = np.array(dt.iloc[i]).reshape(1,-1)
+    sc = StandardScaler()
+    # x = pd.DataFrame(x, index=x.index, columns=x.columns)
+    X = sc.fit_transform(x)
+    # X = pd.DataFrame(X, index=X.index, columns=X.columns)
+    print(X)
+
+    mlp_based_decision = getMLP_decision(X)
+    ecg_history.append([dt.iloc[i]["BPM"],dt.iloc[i]["R-R Interval RV"]])
+    ecgbased = getRuleBasedDecision(theta=theta,theta_threshold=15,per_amplitude=per_amplitude,per_amplitude_threshold=15,bpm_threshold=150,rr_threshold=350,ecg_histroy=ecg_history)
+    cum_decsion = cumulative_decsion(mlp_based_decision,ecgbased)
+    print(data.iloc[i])
+    print(cumulative_decsion)
+    print(label[i])
+    results.append([dt.iloc[i], cum_decsion,label[i],ecgbased,mlp_based_decision])
+results = pd.DataFrame(results)
+results.to_csv("vamos.csv")

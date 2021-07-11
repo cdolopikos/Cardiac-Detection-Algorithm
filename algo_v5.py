@@ -124,9 +124,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
              "EGM Skewness RV": 0,
              "EGM Kurtosis RV": 0,
              "R-R Interval RV": 0,
-             "BP": 0,
-             "Max Actual BP": 0,
-             "Mean Actual BP": 0,
+             # "BP": 0,
+             # "Max Actual BP": 0,
+             # "Mean Actual BP": 0,
              "Per Mean": 0,
              "Per STD": 0,
              "Per Skewness": 0,
@@ -213,8 +213,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             interval_stats = stats.copy()
 
-            update_dict = {"Max Actual BP": max_bp_interval,
-                           "Mean Actual BP": mean_bp_interval,
+            update_dict = {
+                # "Max Actual BP": max_bp_interval,
+                #            "Mean Actual BP": mean_bp_interval,
                            "BPM": bpm_interval,
                            "EGM Mean RV": egmMean_interval,
                            "EGM STD RV": egmSTD_interval,
@@ -298,7 +299,8 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 tmpgrad=0
 
 
-            update_dict = {"BP": bp_inteerval,
+            update_dict = {
+                # "BP": bp_inteerval,
                            "Quality of Perfusion":sim_score,
                            "Perfusion Amplitude": perfusion_amplitude,
                            "Current Perfusion Grad": tmpgrad,
@@ -382,8 +384,8 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     return output
 
 #
-if __name__ == '__main__':
-    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
-    output_pd = pd.DataFrame(output)
-    output_pd.to_csv("paok.csv")
+# if __name__ == '__main__':
+#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
+#     output_pd = pd.DataFrame(output)
+#     output_pd.to_csv("paok.csv")
 #     print("Done")

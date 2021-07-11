@@ -1,14 +1,14 @@
 import pandas as pd
 import numpy as np
 
-import concat
-import automation_labelling_algo
-import regression_calc
-from sklearn.linear_model import LinearRegression
-import matplotlib.pyplot as plt
+# import concat
+# import automation_labelling_algo
+# import regression_calc
+# from sklearn.linear_model import LinearRegression
+# import matplotlib.pyplot as plt
 
 #
-df = pd.read_csv("/Preprocessed_data/combined_csv.csv")
+df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/training_combined_csv.csv")
 print(df.head(5))
 
 data = df[["Max Actual BP", "Current Perfusion Grad"]]
@@ -44,8 +44,8 @@ for i in range(len(data)):
 
     # elif 40<bp<100 and theta>45:
     #     print("")
-df.to_csv("/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Preprocessed_data/cleaned_data.csv")
+df.to_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/cleaned_data.csv")
 
-regression_calc.regre_proc()
-automation_labelling_algo.reader()
-concat.concat()
+# regression_calc.regre_proc()
+# automation_labelling_algo.reader()
+# concat.concat()

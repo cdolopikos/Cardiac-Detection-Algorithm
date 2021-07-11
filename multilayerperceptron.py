@@ -81,4 +81,4 @@ def mlp(att, lbl):
     print("Multilayer Perceptron setting up is finished")
     # return mlp
 
-mlp(X_train,y_train)
+mlp(X,y)

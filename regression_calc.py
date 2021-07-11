@@ -6,7 +6,7 @@ from sklearn.preprocessing import PolynomialFeatures
 from pickle import dump
 import matplotlib.pyplot as plt
 
-df=pd.read_csv("/Preprocessed_data/cleaned_data.csv")
+df=pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/cleaned_data.csv")
 # data = df[["Max Actual BP", "Current Perfusion Grad"]]
 x=np.array(df["Current Perfusion Grad"]).reshape(-1,1)
 y=df["Max Actual BP"]
@@ -32,3 +32,6 @@ plt.show()
 # print("Model intercept:", poly_model.intercept_)
 
 
+# todo the 66% have them have a regression calc to do the model
+# todo 66% is also going to be used for training the mlp model
+# todo 33% of the data is going to be the emulation of the patient and hope for the best
