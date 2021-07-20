@@ -165,21 +165,29 @@ for f in glob.glob("*"):
                 # lsr1=pd.read_csv(zf.open(laser1))
                 # blood_pressure=pd.read_csv(zf.open(bp))
                 blood_pressure=(zf.open(bp))
-                if "Noise" in period:
-                    label=1
+                print("???????????????????????????????", period)
+                if "Lead Noise" in period:
+                    label = 0
+                    print("noise")
                 elif "Normal" in period:
-                    label=0
+                    label = 1
+                    print("normal")
                 elif "Baseline" in period:
-                    label=0
+                    label = 1
+                    print("baseline")
                 elif "VVI" in period:
-                    label=3
-                elif "AAI" in period:
-                    label=3
-                elif "Slow" in period:
                     label = 2
+                    print("vvi")
+                elif "AAI" in period:
+                    label = 3
+                    print("aai")
+                elif "Slow VT" in period:
+                    label = 4
+                    print("slow")
                 elif "NSR" in period:
-                    label =0
-                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=period, decision=label)
+                    label = 1
+                    print("nsr")
+                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=label)
 
                 # print(out)
                 csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out"+str(flname)+str(period)+".csv"
@@ -229,22 +237,30 @@ for f in glob.glob("*"):
                 # blood_pressure = (zf.open(bp))
                 blood_pressure = (pd.read_csv(zf.open(bp)))[begin:end]
                 blood_pressure = blood_pressure.to_csv("blood_pressure.txt",index=False)
-                if "Noise" in period:
+                print("???????????????????????????????",period)
+                if "Lead Noise" in period:
                     label=0
+                    print("noise")
                 elif "Normal" in period:
                     label=1
+                    print("normal")
                 elif "Baseline" in period:
                     label=1
+                    print("baseline")
                 elif "VVI" in period:
                     label=2
+                    print("vvi")
                 elif "AAI" in period:
-                    label=2
-                elif "Slow" in period:
-                    label = 3
+                    label=3
+                    print("aai")
+                elif "Slow VT" in period:
+                    label = 4
+                    print("slow")
                 elif "NSR" in period:
-                    label =4
+                    label =1
+                    print("nsr")
                 # print(pd.read_csv("ldrv.txt"))
-                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=period, decision=label)
+                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=label)
                 csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out" + str(flname) + str(
                     period) + ".csv"
                 print("SHAPE",out.shape)
@@ -271,3 +287,4 @@ sys.exit()
         #     # print(database["File"])
         #     if f in database["File"]:
         #         print("ok")
+cfghv

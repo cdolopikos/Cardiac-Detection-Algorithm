@@ -7,7 +7,9 @@ import numpy as np
 # mlp.predict()
 from sklearn.preprocessing import StandardScaler
 
+# data = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv")
 data = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/testing_combined_csv.csv")
+# data = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0014_vvi_180_01_09_02_2021_122759_Baseline.csv")
 print(data.head(5))
 print(data.columns)
 dt = data.iloc[:, 0:(len(data.columns) - 1)]
@@ -72,6 +74,10 @@ def cumulative_decsion(mlp_based_decision,ecgbased):
     elif ecgbased == "shock":
         ecg_based_decision = 1
     decision = mlp_based_decision * ecg_based_decision
+    if decision == 1:
+        decision = "shock"
+    else:
+        decision = "no-shock"
     return decision
 
 
@@ -82,10 +88,10 @@ for i in range(len(data)):
     # print()
     theta=dt.iloc[i]["Current Perfusion Grad"]
     per_amplitude =dt.iloc[i]["Perfusion Amplitude"]
-    x = np.array(dt.iloc[i]).reshape(1,-1)
-    sc = StandardScaler()
+    X = np.array(dt.iloc[i]).reshape(1,-1)
+    # sc = StandardScaler()
     # x = pd.DataFrame(x, index=x.index, columns=x.columns)
-    X = sc.fit_transform(x)
+    # X = sc.fit_transform(x)
     # X = pd.DataFrame(X, index=X.index, columns=X.columns)
     print(X)
 
@@ -96,6 +102,17 @@ for i in range(len(data)):
     print(data.iloc[i])
     print(cumulative_decsion)
     print(label[i])
-    results.append([dt.iloc[i], cum_decsion,label[i],ecgbased,mlp_based_decision])
-results = pd.DataFrame(results)
+    if label[i] == 0:
+        lbl="Lead Noise"
+    elif label[i] == 1:
+        lbl="Normal"
+    elif label[i] == 2:
+        lbl = "VVI"
+    elif label[i] == 3:
+        lbl = "AAI"
+    elif label[i] == 4:
+        lbl = "Slow"
+    results.append([dt.iloc[i], cum_decsion,lbl,ecgbased,mlp_based_decision])
+results = pd.DataFrame(results,columns=["Data","Cum dec", "Actual Label", "ECG decision", "mlp decision"])
+
 results.to_csv("vamos.csv")

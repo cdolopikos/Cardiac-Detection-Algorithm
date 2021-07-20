@@ -55,7 +55,7 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
 
 
 
-def main(electrogram_path, perfusion_path, bp_path, period, decision):
+def main(electrogram_path, perfusion_path, bp_path, period):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     BP_PATH = bp_path
@@ -118,15 +118,17 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     cons = []
     output = []
 
-    stats = {"BPM": 0,
+    stats = {"Global Time": 0,
+             "BPM": 0,
              "EGM Mean RV": 0,
              "EGM STD RV": 0,
              "EGM Skewness RV": 0,
              "EGM Kurtosis RV": 0,
+             "EGM Quality":0,
              "R-R Interval RV": 0,
              # "BP": 0,
-             # "Max Actual BP": 0,
-             # "Mean Actual BP": 0,
+             "Max Actual BP": 0,
+             "Mean Actual BP": 0,
              "Per Mean": 0,
              "Per STD": 0,
              "Per Skewness": 0,
@@ -139,7 +141,7 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
              # "Per Cum. Skewness": 0,
              # "Per Cum. Kurtosis": 0,
              # "Cumulative Perfusion Grad": 0,
-             "Decision": decision}
+             "Decision": period}
 
     start = 0
     rr_interval = 1000
@@ -172,9 +174,10 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
         # EGM Peak detection
         prom = np.mean(ecg_out)
         peaks, properties = find_peaks(ecg_out, prominence=prom, width=20)
+        min_peaks, properties = find_peaks(-1*ecg_out, prominence=prom, width=20)
 
         peak_pairs_to_process = []
-
+        print(peaks)
         for p in list(peaks):
             # global index
             if p > 1400 and p <= 1600:
@@ -182,6 +185,37 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 if len(mat_pks) > 0:
                     peak_pairs_to_process.append((mat_pks[0], peak_global_time))
                 mat_pks.appendleft(peak_global_time)
+
+        ecg_history = []
+        for i in range(len(peaks)):
+            # start = min_peaks[np.abs(min_peaks - peaks[i]).argmin()]
+            # finish = min_peaks[np.abs(min_peaks - peaks[i+1]).argmin()]
+            start = peaks[i] - 250
+            if start < 0:
+                start = 0
+            finish = peaks[i] + 250
+            if finish > 2000:
+                finish = 2000
+            tmp_ecg = ecg_out[start:finish]
+            ecg_history.append(tmp_ecg)
+
+        ecg_sim_scores = []
+        for i in range(len(ecg_history)):
+            if i < len(ecg_history)-1:
+                tmp_ecg=ecg_history[i]
+                tmp_ecg1=ecg_history[i+1]
+                if len(tmp_ecg) <= len(tmp_ecg1):
+                    for a in range(len(tmp_ecg)):
+                        if not np.isnan(tmp_ecg[a]) and not np.isnan(tmp_ecg1[a]):
+                            dif = np.power(np.log(tmp_ecg[a]), 2) - np.power(np.log(tmp_ecg1[a]), 2)
+                            similarity = np.sqrt(dif)
+                elif len(tmp_ecg1)<len(tmp_ecg):
+                    for a in range(len(tmp_ecg1)):
+                        if not np.isnan(tmp_ecg1[a]) and not np.isnan(tmp_ecg[a]):
+                            dif = np.power(np.log(tmp_ecg1[a]), 2) - np.power(np.log(tmp_ecg[a]), 2)
+                            similarity = np.sqrt(dif)
+                ecg_sim_scores.append(similarity)
+        ecg_sim_score = np.nansum(ecg_sim_scores) / len(ecg_sim_scores)
 
         for start_global_time, end_global_time in peak_pairs_to_process:
             start_local_time = start_global_time - (count*STEP_SIZE)
@@ -191,7 +225,6 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
 
             rr_interval = end_local_time - start_local_time
             bpm_interval = 60000 / rr_interval
-
 
 
             # problem
@@ -211,16 +244,19 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             egmSkew_interval = skew(ecg_out[start_local_time:end_local_time])
             egmKurtosis_interval = kurtosis(ecg_out[start_local_time:end_local_time])
 
+            global_time_of_beat = peaks[len(peaks)-1] + (count*STEP_SIZE)
             interval_stats = stats.copy()
 
             update_dict = {
-                # "Max Actual BP": max_bp_interval,
-                #            "Mean Actual BP": mean_bp_interval,
+                "Max Actual BP": max_bp_interval,
+                           "Mean Actual BP": mean_bp_interval,
+                           "Global Time": global_time_of_beat,
                            "BPM": bpm_interval,
                            "EGM Mean RV": egmMean_interval,
                            "EGM STD RV": egmSTD_interval,
                            "EGM Skewness RV": egmSkew_interval,
                            "EGM Kurtosis RV": egmKurtosis_interval,
+                           "EGM Quality": abs(ecg_sim_score),
                            "R-R Interval RV": rr_interval}
 
             interval_stats.update(update_dict)
@@ -254,14 +290,14 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             for i in mat:
                 for a in range(len(perfusion_consensus)):
                     if not np.isnan(perfusion_consensus[a]) and not np.isnan(i[a]):
-                        dif=np.power(perfusion_consensus[a],2)-np.power(i[a],2)
+                        dif=np.power(np.log(perfusion_consensus[a]),2)-np.power(np.log(i[a]),2)
                         similarity = np.sqrt(dif)
 
                 # similarity = np.nansum(np.sqrt(np.power((a-b),2)) for a, b in zip(perfusion_consensus,i))
                         sim_scores.append(similarity)
             sim_score = np.nansum(sim_scores)/len(sim_scores)
 
-            print("!!!!!!!!!!!!!!!!",sim_score)
+            # print("!!!!!!!!!!!!!!!!",sim_score)
 
 
             try:
@@ -273,7 +309,9 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
             perfusion_consensus_max = perfusion_consensus[perfusion_consensus_argmax]
             # print(perfusion_consensus_max)
             perfusion_consensus_min = perfusion_consensus[0]
-            perfusion_amplitude = perfusion_consensus_max-perfusion_consensus_min
+            perfusion_amplitude = np.log(perfusion_consensus_max)-np.log(perfusion_consensus_min)
+            if np.isinf(perfusion_amplitude):
+                perfusion_amplitude=0
             per_cons=[]
             for p in perfusion_consensus:
                 if not np.isnan(p):
@@ -287,6 +325,8 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 theta = ((perfusion_consensus_max-perfusion_consensus_min) /abs(perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
                 # print("!!!!!!!!!!!!!!Theta",theta)
                 tmpgrad = math.degrees(math.atan(theta))
+                if np.isinf(tmpgrad):
+                    tmpgrad=0
 
                 # print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad
                 bp_inteerval = model.predict([[tmpgrad]])[0]
@@ -298,12 +338,15 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
                 bp_inteerval=0
                 tmpgrad=0
 
-
+            if np.isinf(np.log(perfusion_amplitude)):
+                perfusion_amplitude=perfusion_amplitude
+            else:
+                perfusion_amplitude=np.log(perfusion_amplitude)
             update_dict = {
                 # "BP": bp_inteerval,
-                           "Quality of Perfusion":sim_score,
-                           "Perfusion Amplitude": perfusion_amplitude,
-                           "Current Perfusion Grad": tmpgrad,
+                           "Quality of Perfusion":abs(sim_score),
+                           "Perfusion Amplitude": abs(perfusion_amplitude),
+                           "Current Perfusion Grad": (tmpgrad),
                            "Per Mean": perfusion_mean,
                            "Per STD": perfusion_sd,
                            "Per Skewness": perSkew,
@@ -384,8 +427,8 @@ def main(electrogram_path, perfusion_path, bp_path, period, decision):
     return output
 
 #
-# if __name__ == '__main__':
-#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1,decision=1)
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
-#     print("Done")
+if __name__ == '__main__':
+    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
+# #     print("Done")

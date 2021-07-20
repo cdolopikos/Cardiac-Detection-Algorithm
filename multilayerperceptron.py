@@ -8,24 +8,23 @@ from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, r
 from pickle import dump
 import pandas as pd
 
-
 X = mldata.getAll_attributes()
 y = mldata.getAll_labels()
-data = mldata.df
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
-sc = StandardScaler()
-X_train_array = sc.fit_transform(X_train.values)
-X_train = pd.DataFrame(X_train_array, index=X_train.index, columns=X_train.columns)
-X_test_array = sc.transform(X_test.values)
-X_test = pd.DataFrame(X_test_array, index=X_test.index, columns=X_test.columns)
-test_data=pd.DataFrame([X_test,y_test])
-test_data.to_csv("test_data.csv")
-
 
 # Multilayer Perceptron initially used for configuration and testing
 def mlpDev():
+    X = mldata.getAll_attributes()
+    y = mldata.getAll_labels()
+    data = mldata.df
 
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33)
+    # sc = StandardScaler()
+    # X_train_array = sc.fit_transform(X_train.values)
+    X_train = pd.DataFrame(X_train, index=X_train.index, columns=X_train.columns)
+    # X_test_array = sc.transform(X_test.values)
+    X_test = pd.DataFrame(X_test, index=X_test.index, columns=X_test.columns)
+    # test_data = pd.DataFrame([X_test, y_test])
+    # test_data.to_csv("test_data.csv")
     # Initializing the multilayer perceptron
     # mlp = MLPClassifier(hidden_layer_sizes=(25,11,7,5,3), solver='lbfgs', learning_rate_init=0.5, max_iter=10000)
     mlp = MLPClassifier(hidden_layer_sizes=(512,256,128,64,32,8), solver='lbfgs', learning_rate_init=0.5, max_iter=1000)
@@ -55,14 +54,14 @@ def mlpDev():
     return cm
 
 xi=[]
-# for i in range(5):
-#     print(i)
-#     x= mlpDev()
-#     if i == 0:
-#         xi=x
-#     else:
-#         xi=xi+x
-#     print(xi)
+for i in range(5):
+    print(i)
+    x= mlpDev()
+    if i == 0:
+        xi=x
+    else:
+        xi=xi+x
+    print(xi)
 
 
 # Multilayer Perceptron setup

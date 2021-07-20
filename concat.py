@@ -11,15 +11,24 @@ def concat():
     print(all_filenames)
     #combine all files in the list
     combined_csv = pd.concat([pd.read_csv(f) for f in all_filenames ])
-    combined_csv=combined_csv.fillna(0)
+    # testing_combined_csv = pd.concat([pd.read_csv(f).iloc[:int(len(f)*0.5)] for f in all_filenames ])
+    # training_combined_csv = pd.concat([pd.read_csv(f).iloc[int(len(f)*0.5):] for f in all_filenames ])
+    test=[]
+    train=[]
+    # for f in all_filenames:
+    #     dt = pd.read_csv(f)
+    #     training=dt[:int(len(dt)*0.5)]
+    #     testing = dt[int(len(dt)*0.5):]
+    #     test.append(testing)
+    #     train.append(training)
+    # testing_combined_csv = pd.concat(testing)
+    # training_combined_csv = pd.concat(training)
+    # combined_csv=combined_csv.fillna(0)
     # for f in all_filenames:
     #     print(f)
     #     pd.read_csv(f)
     #export to csv
-    tmp = combined_csv[(combined_csv.index > np.percentile(combined_csv.index, 33)) & (combined_csv.index <= np.percentile(combined_csv.index, 66))]
-    print(len(combined_csv))
-    print(len(combined_csv.iloc[:int(len(combined_csv)*0.5)]))
-    print(len(combined_csv.iloc[int(len(combined_csv)*0.5):]))
+
     testing_combined_csv = combined_csv.iloc[:int(len(combined_csv)*0.5)]
     testing_combined_csv.to_csv( "/Users/cmdgr/OneDrive - Imperial College London/pr_data/testing_combined_csv.csv", index=False, encoding='utf-8-sig')
 
