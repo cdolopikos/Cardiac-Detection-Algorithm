@@ -124,6 +124,7 @@ database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/database2.csv"
 path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped"
 count = 0
 os.chdir(path)
+
 # for file in glob.glob("*"):
 #     if file == "database.csv":
 #         continue
@@ -131,6 +132,7 @@ os.chdir(path)
 #         os.chdir("/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/" + file)
 
 for f in glob.glob("*"):
+    tmp = []
     flname = f.lower().split(".zip")[0]
     print("f", f)
     count += 1
@@ -181,19 +183,21 @@ for f in glob.glob("*"):
                 elif "AAI" in period:
                     label = 3
                     print("aai")
-                elif "Slow VT" in period:
+                elif "VT" in period:
                     label = 4
                     print("slow")
                 elif "NSR" in period:
                     label = 1
                     print("nsr")
-                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=label)
+                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1,bp_path=blood_pressure,period=label, extra=0)
 
                 # print(out)
                 csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out"+str(flname)+str(period)+".csv"
                 # out.to_csv(os.get(),index=False, encoding='utf-8-sig')
                 out.to_csv(csv, index=False)
         else:
+
+
             for i in range(len(df)):
                 zf = zipfile.ZipFile("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/" + str(f))
                 if  isinstance(df.iloc[i].loc["LeadRV"], str):
@@ -253,20 +257,47 @@ for f in glob.glob("*"):
                 elif "AAI" in period:
                     label=3
                     print("aai")
-                elif "Slow VT" in period:
+                elif "VT" in period:
                     label = 4
                     print("slow")
                 elif "NSR" in period:
                     label =1
                     print("nsr")
                 # print(pd.read_csv("ldrv.txt"))
-                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=label)
-                csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out" + str(flname) + str(
-                    period) + ".csv"
-                print("SHAPE",out.shape)
-                # out.to_csv(os.get(),index=False, encoding='utf-8-sig')
-                out.to_csv(csv, index=False)
+                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=label,extra=begin)
+                tmp_out =out
+                # for t in range(len(tmp_out)):
+                #     if i == 0:
+                #         print("xuse",tmp_out.iloc[t].loc["Global Time"])
+                #         tmp_time=int(tmp_out.iloc[t].loc["Global Time"])+int(begin)
+                #         print(tmp_time,"gamidi")
+                #         tmp_out.replace(tmp_out.iloc[t].loc["Global Time"],tmp_time)
+                #     else:
+                #         print("xuse", tmp_out.iloc[t].loc["Global Time"])
+                #         tmp_time = int(tmp_out.iloc[t].loc["Global Time"]) + int(end)
+                #         print(tmp_time, "gamidi")
+                #         tmp_out.replace(tmp_out.iloc[t].loc["Global Time"], tmp_time)
+                #     # tmp_out.iloc[t].loc["Global Time"].replace(tmp_time)
+                #     print("xuse",tmp_out.iloc[t].loc["Global Time"])
+                tmp.append(tmp_out)
+                print("aaaaaaaa",len(tmp))
+            if len(tmp)>0:
+                print(len(tmp))
+                combined_csv = pd.concat(tmp)
+                for q in tmp:
+                    print("axpoutsa",q)
+                # tmp=pd.DataFrame(tmp)
 
+            # print("poutana",tmp_out)
+            # for p in tmp_out:
+            #     print("floki",p)
+
+
+            csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out" + str(flname) + ".csv"
+            # print("SHAPE",out.shape)
+            # # out.to_csv(os.get(),index=False, encoding='utf-8-sig')
+            combined_csv.to_csv(csv, index=False)
+            # tmp.clear()
 
 sys.exit()
 
@@ -287,4 +318,3 @@ sys.exit()
         #     # print(database["File"])
         #     if f in database["File"]:
         #         print("ok")
-cfghv

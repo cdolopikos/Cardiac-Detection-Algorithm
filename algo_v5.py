@@ -55,7 +55,7 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
 
 
 
-def main(electrogram_path, perfusion_path, bp_path, period):
+def main(electrogram_path, perfusion_path, bp_path, period,extra):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     BP_PATH = bp_path
@@ -216,6 +216,8 @@ def main(electrogram_path, perfusion_path, bp_path, period):
                             similarity = np.sqrt(dif)
                 ecg_sim_scores.append(similarity)
         ecg_sim_score = np.nansum(ecg_sim_scores) / len(ecg_sim_scores)
+        # if np.isnan(ecg_sim_score) or np.isinf(ecg_sim_score):
+        #     ecg_sim_score=0
 
         for start_global_time, end_global_time in peak_pairs_to_process:
             start_local_time = start_global_time - (count*STEP_SIZE)
@@ -250,7 +252,7 @@ def main(electrogram_path, perfusion_path, bp_path, period):
             update_dict = {
                 "Max Actual BP": max_bp_interval,
                            "Mean Actual BP": mean_bp_interval,
-                           "Global Time": global_time_of_beat,
+                           "Global Time": (global_time_of_beat+extra),
                            "BPM": bpm_interval,
                            "EGM Mean RV": egmMean_interval,
                            "EGM STD RV": egmSTD_interval,
@@ -427,8 +429,8 @@ def main(electrogram_path, perfusion_path, bp_path, period):
     return output
 
 #
-if __name__ == '__main__':
-    output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
-    output_pd = pd.DataFrame(output)
-    output_pd.to_csv("paok.csv")
+# if __name__ == '__main__':
+#     output = main(perfusion_path=pp, bp_path=bpp, electrogram_path=ee, period=1)
+#     output_pd = pd.DataFrame(output)
+#     output_pd.to_csv("paok.csv")
 # #     print("Done")
