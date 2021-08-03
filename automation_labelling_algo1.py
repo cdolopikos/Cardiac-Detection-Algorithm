@@ -117,6 +117,7 @@ import glob, os
 # df = pd.read_csv(zf.open('intfile.csv'))
 # print(zf.infolist())
 database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/database2.csv")
+# database = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/db1.csv")
 # database.set_index("File", inplace=True)
 # # print(database.columns)
 # for i in database["File"]:
@@ -284,8 +285,8 @@ for f in glob.glob("*"):
             if len(tmp)>0:
                 print(len(tmp))
                 combined_csv = pd.concat(tmp)
-                for q in tmp:
-                    print("axpoutsa",q)
+                # for q in tmp:
+                    # print("axpoutsa",q)
                 # tmp=pd.DataFrame(tmp)
 
             # print("poutana",tmp_out)

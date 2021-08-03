@@ -1,3 +1,4 @@
+from pickle import dump, load
 import numpy as np
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.svm import SVC
@@ -18,8 +19,10 @@ sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.fit_transform(X_test)
 
-features_matrix = X_train
-labels = Y_train
+# features_matrix = X_train
+features_matrix = X
+labels = Y
+# labels = Y_train
 model = svm.SVC()
 test_feature_matrix = X_test
 test_labels = Y_test
@@ -40,23 +43,33 @@ def svmDev():
     print("FINISHED classifying. accuracy score : ")
     print(accuracy_score(test_labels, predicted_labels))
     print(len(test_labels))
-    cm=confusion_matrix(test_labels, predicted_labels, labels=(1,2,3,4,5))
+    cm=confusion_matrix(test_labels, predicted_labels, labels=(1,2,3,4))
     print("cm", cm)
+    dump(model, open('svm.pkl', 'wb'))
 
 
-
-svmDev()
-
+# for i in range(0,10):
+#     svmDev()
+count=0
+md = load(open('svm.pkl', 'rb'))
+for i in range(len(X)):
+    x=np.array(X.iloc[i]).reshape((1,-1))
+    pred=md.predict(x)
+    if pred==Y.iloc[i]:
+        count=count+1
+print(count/len(Y))
 #Actual svm setup
-# def supvm(att, lbl):
-#     print("Support Vector Machine is setting up")
-#     sc = StandardScaler()
-#     X = sc.fit_transform(att)
-#     features_matrix = X
-#     labels = lbl
-#     model = svm.SVC(kernel='rbf', C=100, gamma=0.00001, probability=True)
-#     train model
-    # model.fit(features_matrix, labels)
-    # print("Support Vector Machine setting up is finished")
+def supvm(att, lbl):
+    print("Support Vector Machine is setting up")
+    # sc = StandardScaler()
+    # X = sc.fit_transform(att)
+    features_matrix = X
+    labels = lbl
+    model = svm.SVC(kernel='rbf', C=10, gamma=0.1, probability=True)
+    # train model
+    model.fit(att, lbl)
+    print("Support Vector Machine setting up is finished")
+    dump(model, open('svm.pkl', 'wb'))
     # return model
-#
+
+# supvm(features_matrix,labels)

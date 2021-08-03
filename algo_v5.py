@@ -100,7 +100,7 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
         table = QTableWidget()
         table.setColumnCount(3)
         table.setRowCount(2)
-        table.setHorizontalHeaderLabels(["BPM", "Perfusion-Gradient", "Decision"])
+        table.setHorizontalHeaderLabels(["BPM", "Perfusion-Gradient", "Diagnosis"])
 
     mat = collections.deque(maxlen=6)
     mat_pks = collections.deque(maxlen=50)
@@ -126,6 +126,7 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
              "EGM Kurtosis RV": 0,
              "EGM Quality":0,
              "R-R Interval RV": 0,
+             "BP Estimat": 0,
              # "BP": 0,
              "Max Actual BP": 0,
              "Mean Actual BP": 0,
@@ -141,7 +142,7 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
              # "Per Cum. Skewness": 0,
              # "Per Cum. Kurtosis": 0,
              # "Cumulative Perfusion Grad": 0,
-             "Decision": period}
+             "Diagnosis": period}
 
     start = 0
     rr_interval = 1000
@@ -216,8 +217,8 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
                             similarity = np.sqrt(dif)
                 ecg_sim_scores.append(similarity)
         ecg_sim_score = np.nansum(ecg_sim_scores) / len(ecg_sim_scores)
-        # if np.isnan(ecg_sim_score) or np.isinf(ecg_sim_score):
-        #     ecg_sim_score=0
+        if np.isnan(ecg_sim_score) or np.isinf(ecg_sim_score):
+            ecg_sim_score=0
 
         for start_global_time, end_global_time in peak_pairs_to_process:
             start_local_time = start_global_time - (count*STEP_SIZE)
@@ -249,7 +250,9 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
             global_time_of_beat = peaks[len(peaks)-1] + (count*STEP_SIZE)
             interval_stats = stats.copy()
 
+
             update_dict = {
+
                 "Max Actual BP": max_bp_interval,
                            "Mean Actual BP": mean_bp_interval,
                            "Global Time": (global_time_of_beat+extra),
@@ -326,33 +329,37 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
                 # print(perfusion_consensus_min)
                 theta = ((perfusion_consensus_max-perfusion_consensus_min) /abs(perfusion_consensus_argmax-perfusion_consensus_argmin)) *10
                 # print("!!!!!!!!!!!!!!Theta",theta)
-                tmpgrad = math.degrees(math.atan(theta))
-                if np.isinf(tmpgrad):
-                    tmpgrad=0
+                # tmpgrad = math.degrees(math.atan(theta))
+                if np.isinf(theta):
+                    theta=0
 
                 # print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad
-                bp_inteerval = model.predict([[tmpgrad]])[0]
+                bp_inteerval = np.log10(bpm_interval/ (theta*rr_interval*sim_score))
+                # bp_inteerval = model.predict([[theta]])[0]
                 # bp_inteerval = float(tmpgrad * perfusion_consensus_argmax * 0.00750062)
                 # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
                 # bp_inteerval = float((bpm_interval*(tmpgrad))*rr_interval* 0.00750062)
                 # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
             else:
                 bp_inteerval=0
-                tmpgrad=0
+                theta=0
 
             if np.isinf(np.log(perfusion_amplitude)):
                 perfusion_amplitude=perfusion_amplitude
             else:
                 perfusion_amplitude=np.log(perfusion_amplitude)
+
+
             update_dict = {
-                # "BP": bp_inteerval,
+                "BP Estimat": bp_inteerval,
                            "Quality of Perfusion":abs(sim_score),
                            "Perfusion Amplitude": abs(perfusion_amplitude),
-                           "Current Perfusion Grad": (tmpgrad),
+                           "Current Perfusion Grad": (theta),
                            "Per Mean": perfusion_mean,
                            "Per STD": perfusion_sd,
                            "Per Skewness": perSkew,
                            "Per Kurtosis": perKurtosis}
+                            # "aprox": (sim_score*tmpgrad)}
 
             interval_stats.update(update_dict)
             ecg_data.append([bpm_interval,rr_interval])

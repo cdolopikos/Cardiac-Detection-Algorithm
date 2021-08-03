@@ -5,14 +5,18 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 
-# path = os.path.dirname(os.getcwd()) + '/AAD_1/Preprocessed_data/combined_csv.csv'
+# path = os.path.dirname(os.getcwd()) + '/pr_data/Preprocessed_data/combined_csv.csv'
 # path = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/paok.csv"
-path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/training_combined_csv.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv"
+path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/realistic test/outvtfi0014_vvi_160_01_09_02_2021_122951_.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/testing_combined_csv.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0016_vvi160_01_16_03_2021_152035_.csv"
 
 # gets preprocessed data from csv and returns a dataframe
 def setData(pth):
     df = pd.read_csv(pth, dtype='float32')
     df = df.replace('#', '')
+    df = df.sample(frac=1).reset_index(drop=True)
     return df
 
 
@@ -23,7 +27,7 @@ df = setData(path)
 x = df.iloc[:, 0:(len(df.columns) - 1)]
 # y gets all labels
 y = df.iloc[:, -1]
-print(y)
+# print(y)
 # split x and y into training and test
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=66)
 

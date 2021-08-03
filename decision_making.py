@@ -63,7 +63,7 @@ def getRuleBasedDecision(theta, theta_threshold,per_amplitude, per_amplitude_thr
 # returns string
 
 def getMLP_decision(instance):
-    mlp = load(open('mlp.pkl', 'rb'))
+    mlp = load(open('svm.pkl', 'rb'))
     mlp_based_decision = mlp.predict(instance)
     return mlp_based_decision
 # return int
@@ -99,6 +99,7 @@ for i in range(len(data)):
     ecg_history.append([dt.iloc[i]["BPM"],dt.iloc[i]["R-R Interval RV"]])
     ecgbased = getRuleBasedDecision(theta=theta,theta_threshold=15,per_amplitude=per_amplitude,per_amplitude_threshold=15,bpm_threshold=150,rr_threshold=350,ecg_histroy=ecg_history)
     cum_decsion = cumulative_decsion(mlp_based_decision,ecgbased)
+    print(mlp_based_decision)
     print(data.iloc[i])
     print(cumulative_decsion)
     print(label[i])
