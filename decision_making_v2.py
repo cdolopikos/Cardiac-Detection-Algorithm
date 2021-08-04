@@ -7,8 +7,6 @@ import mldata
 instances=mldata.x
 diagnosis = mldata.y
 
-print(instances)
-print(diagnosis)
 # todo prwta apo ola thes na fereis mesa raw data kai meta na ta kaneis preprocess
 # todo ta preprocessed pou erxontai pernan tin eksis aksiologisi
 
@@ -17,7 +15,7 @@ print(diagnosis)
 def getML_decision(instance):
     ml = load(open('svm.pkl', 'rb'))
     ml_based_decision = ml.predict(instance)
-    return ml_based_decision
+    return int(ml_based_decision[0])
 
 # Checks the heamodynamic Stability of the patient based on BP estimat biomarker
 def haemodynamicStability(instance):
@@ -29,6 +27,7 @@ def haemodynamicStability(instance):
     return stability
 
 def makeDecision(ml_decision, heam_stab):
+    decision="n/a"
     if ml_decision == 0 or ml_decision == 1:
         decision = 0
     elif ml_decision==2 or ml_decision == 3 or ml_decision==4:
@@ -37,3 +36,19 @@ def makeDecision(ml_decision, heam_stab):
         else:
             print("need to further investigate")
     return decision
+
+for i in range(len(instances)):
+    ml_dec=getML_decision(np.array(instances.iloc[i]).reshape(1,-1))
+    heam_stab=haemodynamicStability(instances.iloc[i])
+    adoume=makeDecision(ml_dec, heam_stab)
+    print(diagnosis.iloc[i], ml_dec, heam_stab, adoume)
+
+ml = load(open('svm.pkl', 'rb'))
+count=0
+for i in range(len(instances)):
+    x=np.array(instances.iloc[i]).reshape((1,-1))
+
+    pred=ml.predict(x)
+    if pred==diagnosis.iloc[i]:
+        count=count+1
+print(count/len(diagnosis))
