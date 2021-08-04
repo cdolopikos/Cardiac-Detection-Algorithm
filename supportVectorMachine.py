@@ -19,10 +19,10 @@ sc = StandardScaler()
 X_train = sc.fit_transform(X_train)
 X_test = sc.fit_transform(X_test)
 
-# features_matrix = X_train
-features_matrix = X
-labels = Y
-# labels = Y_train
+features_matrix = X_train
+# features_matrix = X
+# labels = Y
+labels = Y_train
 model = svm.SVC()
 test_feature_matrix = X_test
 test_labels = Y_test
@@ -45,7 +45,7 @@ def svmDev():
     print(len(test_labels))
     cm=confusion_matrix(test_labels, predicted_labels, labels=(1,2,3,4))
     print("cm", cm)
-    dump(model, open('svm.pkl', 'wb'))
+    # dump(model, open('svm.pkl', 'wb'))
 
 
 # for i in range(0,10):
