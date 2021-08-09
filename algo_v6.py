@@ -16,19 +16,7 @@ import magic_laser as mgl
 from scipy import fftpack
 import time
 
-# pp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Haem/Atach_CRTD_21_10_2020_164349_/qfin.txt"
-# ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_unzipped_examples/A Tach/Haem/Atach_CRTD_21_10_2020_164349_/boxb.txt"
-# bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/vfi0017_vvi180_01_27_04_2021_152246_/boxb.txt"
 
-# pp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/VTFI0014_VVI_200_01_09_02_2021_123325_/BP.txt"
-pp = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/ADA003_03_12_01_2021_154719_/plethh.txt"
-# ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/vtfi0017_test_aai_his_27_04_2021_150217_/BP.txt"
-# ee = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/VTFI0014_VVI_200_01_09_02_2021_123325_/ecg.txt"
-ee = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/ADA003_03_12_01_2021_154719_/plethg.txt"
-# ee1 = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/ADA003_03_12_01_2021_154719_/plethg.txt"
-# bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/vtfi0017_test_aai_his_27_04_2021_150217_/boxb.txt"
-# bpp = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/Traces_zipped/VTFI0014_VVI_200_01_09_02_2021_123325_/bpao.txt"
-bpp = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/ADA003_03_12_01_2021_154719_/BP.txt"
 
 DEBUG = False
 
@@ -58,18 +46,22 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
 
 
 
-def main(electrogram_path, perfusion_path, bp_path, period,extra):
+def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,extra):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
+    PERFUSION_PATH2 = perfusion_path2
     BP_PATH = bp_path
     model = load(open('/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/model.pkl', 'rb'))
     electrogram = data_reader.Data_Reader(data_path=ELECTROGRAM_PATH)
     perfusion = data_reader.Data_Reader(data_path=PERFUSION_PATH)
+    perfusion2 = data_reader.Data_Reader(data_path=PERFUSION_PATH2)
     bpdata = data_reader.Data_Reader(data_path=BP_PATH)
 
     electrogram_det = electrogram_detector.ElectrogramDetector()
     perfusion_det = perfusion_detector.PerfusionDetector()
+    perfusion_det2 = perfusion_detector.PerfusionDetector()
     bp_det = bp_detector.BPDetector()
+
 
 
     if not DEBUG:
@@ -106,6 +98,7 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
         table.setHorizontalHeaderLabels(["BPM", "Perfusion-Gradient", "Diagnosis"])
 
     mat = collections.deque(maxlen=6)
+    mat2 = collections.deque(maxlen=6)
     mat_pks = collections.deque(maxlen=50)
 
     last_ecg_peak_time = 0
@@ -162,9 +155,12 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
             ecg_out, raw = electrogram_det.detect_new_data()
 
             perfusion_det.load_new_data(perfusion)
-            per_out = perfusion_det.detect_new_data()
+            perfusion_det.load_new_data(perfusion2)
+            per_out2 = perfusion_det2.detect_new_data()
             if np.mean(per_out)<2:
                 per_out=per_out*100
+            if np.mean(per_out2)<2:
+                per_out2=per_out2*100
             # per_out=np.log(per_out)
             bp_det.load_new_data(bpdata)
             bp_out = bp_det.detect_new_data()
@@ -272,7 +268,9 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
 
             # Perfusion
             perfusion_cut = np.zeros(2000) * np.nan
+            perfusion_cut2 = np.zeros(2000) * np.nan
             PERFUSION_lag=lag_calc(start_local_time,end_local_time,per_out)
+            PERFUSION_lag2=lag_calc(start_local_time,end_local_time,per_out2)
             # print(PERFUSION_lag)
             # print("end_global_time",end_local_time)
             # print("start_global_time",start_local_time)
@@ -280,21 +278,29 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
             # print(len(per_out[(start_local_time+PERFUSION_LAG):(end_local_time+PERFUSION_LAG)]))
 
             perfusion_cut[:rr_interval] = per_out[(start_local_time+PERFUSION_lag):(end_local_time+PERFUSION_lag)]
+            perfusion_cut2[:rr_interval] = per_out2[(start_local_time+PERFUSION_lag2):(end_local_time+PERFUSION_lag2)]
             # print("perfusion_cut",perfusion_cut)
             mat.appendleft(perfusion_cut)
+            mat2.appendleft(perfusion_cut2)
 
             perfusion_mat = np.array(mat)
+            perfusion_mat2 = np.array(mat2)
             # print("perfusion_mat",perfusion_mat)
             perfusion_consensus = np.nanmean(perfusion_mat, axis=0)
+            perfusion_consensus2 = np.nanmean(perfusion_mat2, axis=0)
             # print("perfusion_consensus",perfusion_consensus)
             perfusion_consensus_mask = np.isnan(np.sum(perfusion_mat, axis=0))
+            perfusion_consensus_mask2 = np.isnan(np.sum(perfusion_mat2, axis=0))
             # print(perfusion_consensus_mask)
             perfusion_mean = np.nanmean(perfusion_consensus)
+            perfusion_mean2 = np.nanmean(perfusion_consensus2)
             # print(perfusion_mean)
             perfusion_sd = np.nanstd(perfusion_consensus)
+            perfusion_sd2 = np.nanstd(perfusion_consensus2)
             # print(perfusion_sd)
 
             perfusion_consensus[perfusion_consensus_mask] = np.nan
+            perfusion_consensus2[perfusion_consensus_mask2] = np.nan
             sim_scores = []
             for i in mat:
                 for a in range(len(perfusion_consensus)):
@@ -306,27 +312,52 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
                         sim_scores.append(similarity)
             sim_score = np.nansum(sim_scores)/len(sim_scores)
 
+            sim_scores2 = []
+            for i in mat2:
+                for a in range(len(perfusion_consensus2)):
+                    if not np.isnan(perfusion_consensus2[a]) and not np.isnan(i[a]):
+                        dif2=np.power(np.log(perfusion_consensus2[a]),2)-np.power(np.log(i[a]),2)
+                        similarity2 = np.sqrt(dif2)
+
+                # similarity = np.nansum(np.sqrt(np.power((a-b),2)) for a, b in zip(perfusion_consensus,i))
+                        sim_scores2.append(similarity2)
+            sim_score2 = np.nansum(sim_scores2)/len(sim_scores2)
+
             # print("!!!!!!!!!!!!!!!!",sim_score)
 
 
             try:
                 perfusion_consensus_argmax = np.nanargmax(perfusion_consensus)
+                perfusion_consensus_argmax2 = np.nanargmax(perfusion_consensus2)
+                perfusion_consensus_argmin2 = np.nanargmin(perfusion_consensus2)
                 perfusion_consensus_argmin = np.nanargmin(perfusion_consensus)
             except:
                 continue
             # print(perfusion_consensus_argmax)
             perfusion_consensus_max = perfusion_consensus[perfusion_consensus_argmax]
+            perfusion_consensus_max2 = perfusion_consensus2[perfusion_consensus_argmax2]
             # print(perfusion_consensus_max)
             perfusion_consensus_min = perfusion_consensus[0]
+            perfusion_consensus_min2 = perfusion_consensus2[0]
             perfusion_amplitude = np.log(perfusion_consensus_max)-np.log(perfusion_consensus_min)
+            perfusion_amplitude2 = np.log(perfusion_consensus_max2)-np.log(perfusion_consensus_min2)
             if np.isinf(perfusion_amplitude):
                 perfusion_amplitude=0
+            if np.isinf(perfusion_amplitude2):
+                perfusion_amplitude2=0
             per_cons=[]
             for p in perfusion_consensus:
                 if not np.isnan(p):
                     per_cons.append(p)
             perSkew = skew(per_cons)
             perKurtosis = kurtosis(per_cons)
+
+            per_cons2=[]
+            for p in perfusion_consensus2:
+                if not np.isnan(p):
+                    per_cons2.append(p)
+            perSkew2 = skew(per_cons2)
+            perKurtosis2 = kurtosis(per_cons2)
             # print(perfusion_consensus_min)
             if perfusion_consensus_argmax!=0:
                 # print(perfusion_consensus_max)
@@ -347,22 +378,53 @@ def main(electrogram_path, perfusion_path, bp_path, period,extra):
             else:
                 bp_inteerval=0
                 theta=0
+            if perfusion_consensus_argmax2!=0:
+                # print(perfusion_consensus_max)
+                # print(perfusion_consensus_min)
+                theta2 = ((perfusion_consensus_max2-perfusion_consensus_min2) /abs(perfusion_consensus_argmax2-perfusion_consensus_argmin2)) *10
+                # print("!!!!!!!!!!!!!!Theta",theta)
+                # tmpgrad = math.degrees(math.atan(theta))
+                if np.isinf(theta2):
+                    theta2=0
+
+                # print("!!!!!!!!!!!!!!! tmpgrad", tmpgrad
+                bp_inteerval2 = np.log10(bpm_interval/ (theta2*rr_interval*sim_score2))
+                # bp_inteerval = model.predict([[theta]])[0]
+                # bp_inteerval = float(tmpgrad * perfusion_consensus_argmax * 0.00750062)
+                # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
+                # bp_inteerval = float((bpm_interval*(tmpgrad))*rr_interval* 0.00750062)
+                # print("!!!!!!!!!!!!!!! bp", max_bp_interval, bp_inteerval)
+            else:
+                bp_inteerval2=0
+                theta2=0
 
             if np.isinf(np.log(perfusion_amplitude)):
                 perfusion_amplitude=perfusion_amplitude
             else:
                 perfusion_amplitude=np.log(perfusion_amplitude)
+            if np.isinf(np.log(perfusion_amplitude2)):
+                perfusion_amplitude2=perfusion_amplitude2
+            else:
+                perfusion_amplitude2=np.log(perfusion_amplitude2)
 
 
             update_dict = {
-                "BP Estimat": bp_inteerval,
+                           "BP Estimat": bp_inteerval,
                            "Quality of Perfusion":abs(sim_score),
                            "Perfusion Amplitude": abs(perfusion_amplitude),
                            "Current Perfusion Grad": (theta),
                            "Per Mean": perfusion_mean,
                            "Per STD": perfusion_sd,
                            "Per Skewness": perSkew,
-                           "Per Kurtosis": perKurtosis}
+                           "Per Kurtosis": perKurtosis,
+                           "BP Estimat2": bp_inteerval2,
+                           "Quality of Perfusion2":abs(sim_score2),
+                           "Perfusion Amplitude2": abs(perfusion_amplitude2),
+                           "Current Perfusion Grad2": (theta2),
+                           "Per Mean2": perfusion_mean2,
+                           "Per STD2": perfusion_sd2,
+                           "Per Skewness2": perSkew2,
+                           "Per Kurtosis2": perKurtosis2}
                             # "aprox": (sim_score*tmpgrad)}
 
             interval_stats.update(update_dict)
