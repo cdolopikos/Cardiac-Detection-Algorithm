@@ -18,8 +18,8 @@ import time
 
 ecg = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/ecg.txt"
 lsr1 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/plethh.txt"
-# lsr2 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/qfin.txt"
-lsr2=""
+lsr2 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/qfin.txt"
+# lsr2=""
 bp = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/bpao.txt"
 
 DEBUG = False
@@ -139,16 +139,26 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
              "EGM Quality":0,
              "R-R Interval RV": 0,
              "BP Estimat": 0,
+             "BP Estimat2": 0,
              # "BP": 0,
              # "Max Actual BP": 0,
              # "Mean Actual BP": 0,
              "Per Mean": 0,
+             "Per Mean2": 0,
              "Per STD": 0,
+             "Per STD2": 0,
              "Per Skewness": 0,
+             "Per Skewness2": 0,
              "Per Kurtosis": 0,
+             "Per Kurtosis2": 0,
              "Current Perfusion Grad": 0,
+             "Current Perfusion Grad2": 0,
              "Quality of Perfusion":0,
+             "Quality of Perfusion2":0,
              "Perfusion Amplitude":0,
+             "Perfusion Amplitude2":0,
+             "Magic Laser1":0,
+             "Magic Laser2":0,
              # "Per Cum. Mean": 0,
              # "Per Cum. STD": 0,
              # "Per Cum. Skewness": 0,
@@ -236,7 +246,11 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
         ecg_sim_score = np.nansum(ecg_sim_scores) / len(ecg_sim_scores)
         if np.isnan(ecg_sim_score) or np.isinf(ecg_sim_score):
             ecg_sim_score=0
-
+        magic_laser1 = mgl.calc_magic_laser(ecg_data=ecg_out, laser_data=per_out)
+        try:
+            magic_laser2 = mgl.calc_magic_laser(ecg_data=ecg_out, laser_data=per_out2)
+        except:
+            magic_laser2=0
         for start_global_time, end_global_time in peak_pairs_to_process:
             start_local_time = start_global_time - (count*STEP_SIZE)
             if start_local_time<0:
@@ -270,16 +284,20 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
 
             update_dict = {
 
-                # "Max Actual BP": max_bp_interval,
-                #            "Mean Actual BP": mean_bp_interval,
-                #            "Global Time": (global_time_of_beat+extra),
+                "Max Actual BP": max_bp_interval,
+                           "Mean Actual BP": mean_bp_interval,
+                           "Global Time": (global_time_of_beat+extra),
                            "BPM": bpm_interval,
                            "EGM Mean RV": egmMean_interval,
                            "EGM STD RV": egmSTD_interval,
                            "EGM Skewness RV": egmSkew_interval,
                            "EGM Kurtosis RV": egmKurtosis_interval,
                            "EGM Quality": abs(ecg_sim_score),
-                           "R-R Interval RV": rr_interval}
+                           "R-R Interval RV": rr_interval,
+                            "Magic Laser1": magic_laser1,
+                            "Magic Laser2": magic_laser2
+                            }
+
 
             interval_stats.update(update_dict)
 
@@ -365,7 +383,7 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
 
 
                 update_dict = {
-                    "BP Estimat": bp_inteerval,
+                    # "BP Estimat": bp_inteerval,
                                "Quality of Perfusion":abs(sim_score),
                                "Perfusion Amplitude": abs(perfusion_amplitude),
                                "Current Perfusion Grad": (theta),
@@ -644,8 +662,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     return output
 
 # #
-# if __name__ == '__main__':
-#     output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=1)
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
-# #     print("Done")
+if __name__ == '__main__':
+    output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2)
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
+#     print("Done")

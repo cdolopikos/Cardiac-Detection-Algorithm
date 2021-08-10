@@ -37,17 +37,17 @@ for f in glob.glob("*"):
                     continue
                 if not isinstance(laser1, str):
                     continue
-                if not isinstance(laser2, str):
-                    continue
+                if isinstance(laser2, str):
+                    num_lasers=2
                 else:
-                    num_lasers = 2
+                    num_lasers = 1
                 bp=str(bp)+".txt"
                 laser1=str(laser1)+".txt"
                 laser2=str(laser2)+".txt"
                 zf = zipfile.ZipFile("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/"+str(f))
                 ldrv=(zf.open(leadRV))
                 lsr1=(zf.open(laser1))
-                if num_lasers!=2:
+                if num_lasers==2:
                     lsr2=(zf.open(laser2))
                 else:
                     lsr2="lol"
@@ -74,74 +74,85 @@ for f in glob.glob("*"):
                 elif "NSR" in period:
                     label = 1
                     print("nsr")
+                print(num_lasers)
                 out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1, perfusion_path2=lsr2,bp_path=blood_pressure,period=label,num_lasers=num_lasers,extra=0)
 
                 csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out"+str(flname)+str(period)+".csv"
                 out.to_csv(csv, index=False)
-        # else:
-        #
-        #
-        #     for i in range(len(df)):
-        #         zf = zipfile.ZipFile("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/" + str(f))
-        #         if  isinstance(df.iloc[i].loc["LeadRV"], str):
-        #             leadRV = str(df.iloc[i].loc["LeadRV"])+".txt"
-        #         else:
-        #             if isinstance(df.iloc[i].loc["LeadShock"],str):
-        #                 leadRV=str(df.iloc[i].loc["LeadShock"])+".txt"
-        #             else:
-        #                 leadRV = str(df.iloc[i].loc["ECG"]) + ".txt"
-        #         period = df.iloc[i].loc["Period"]
-        #         bp = df.iloc[i].loc["BP"]
-        #         laser1 = df.iloc[i].loc["Laser1"]
-        #         if not isinstance(bp, str):
-        #             continue
-        #         if not isinstance(laser1, str):
-        #             continue
-        #         begin=int(df.iloc[i].loc["Begin"])
-        #         print("BEGIN",begin)
-        #         end = int(df.iloc[i].loc["End"])
-        #         print("END", end)
-        #         bp = str(bp) + ".txt"
-        #         laser1 = str(laser1) + ".txt"
-        #
-        #         ldrv = (pd.read_csv(zf.open(leadRV)))[begin:end]
-        #         ldrv = ldrv.to_csv("ldrv.txt",index=False)
-        #
-        #         lsr1 = (pd.read_csv(zf.open(laser1)))[begin:end]
-        #         lsr1 = lsr1.to_csv("lsr1.txt",index=False)
-        #         blood_pressure = (pd.read_csv(zf.open(bp)))[begin:end]
-        #         blood_pressure = blood_pressure.to_csv("blood_pressure.txt",index=False)
-        #         print("???????????????????????????????",period)
-        #         if "Lead Noise" in period:
-        #             label=0
-        #             print("noise")
-        #         elif "Normal" in period:
-        #             label=1
-        #             print("normal")
-        #         elif "Baseline" in period:
-        #             label=1
-        #             print("baseline")
-        #         elif "VVI" in period:
-        #             label=2
-        #             print("vvi")
-        #         elif "AAI" in period:
-        #             label=3
-        #             print("aai")
-        #         elif "VT" in period:
-        #             label = 4
-        #             print("slow")
-        #         elif "NSR" in period:
-        #             label =1
-        #             print("nsr")
-        #         out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt",bp_path="blood_pressure.txt",period=label,extra=begin)
-        #         tmp_out =out
-        #         tmp.append(tmp_out)
-        #         print("aaaaaaaa",len(tmp))
-        #     if len(tmp)>0:
-        #         print(len(tmp))
-        #         combined_csv = pd.concat(tmp)
-        #
-        #     csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out" + str(flname) + ".csv"
-        #     combined_csv.to_csv(csv, index=False)
+        else:
+
+            num_lasers = 1
+            for i in range(len(df)):
+                zf = zipfile.ZipFile("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Traces_zipped/" + str(f))
+                if  isinstance(df.iloc[i].loc["LeadRV"], str):
+                    leadRV = str(df.iloc[i].loc["LeadRV"])+".txt"
+                else:
+                    if isinstance(df.iloc[i].loc["LeadShock"],str):
+                        leadRV=str(df.iloc[i].loc["LeadShock"])+".txt"
+                    else:
+                        leadRV = str(df.iloc[i].loc["ECG"]) + ".txt"
+                period = df.iloc[i].loc["Period"]
+                bp = df.iloc[i].loc["BP"]
+                laser1 = df.iloc[i].loc["Laser1"]
+                laser2 = df.iloc[i].loc["Laser2"]
+                if not isinstance(bp, str):
+                    continue
+                if not isinstance(laser1, str):
+                    continue
+                if isinstance(laser2, str):
+                    num_lasers=2
+                else:
+                    num_lasers = 1
+                begin=int(df.iloc[i].loc["Begin"])
+                print("BEGIN",begin)
+                end = int(df.iloc[i].loc["End"])
+                print("END", end)
+                bp = str(bp) + ".txt"
+                laser1 = str(laser1) + ".txt"
+                laser2 = str(laser2) + ".txt"
+                ldrv = (pd.read_csv(zf.open(leadRV)))[begin:end]
+                ldrv = ldrv.to_csv("ldrv.txt",index=False)
+
+                lsr1 = (pd.read_csv(zf.open(laser1)))[begin:end]
+                lsr1 = lsr1.to_csv("lsr1.txt",index=False)
+                if num_lasers==2:
+                    lsr2 = (pd.read_csv(zf.open(laser2)))[begin:end]
+                    lsr2 = lsr2.to_csv("lsr2.txt", index=False)
+                else:
+                    lsr2="lol"
+                blood_pressure = (pd.read_csv(zf.open(bp)))[begin:end]
+                blood_pressure = blood_pressure.to_csv("blood_pressure.txt",index=False)
+                print("???????????????????????????????",period)
+                if "Lead Noise" in period:
+                    label=0
+                    print("noise")
+                elif "Normal" in period:
+                    label=1
+                    print("normal")
+                elif "Baseline" in period:
+                    label=1
+                    print("baseline")
+                elif "VVI" in period:
+                    label=2
+                    print("vvi")
+                elif "AAI" in period:
+                    label=3
+                    print("aai")
+                elif "VT" in period:
+                    label = 4
+                    print("slow")
+                elif "NSR" in period:
+                    label =1
+                    print("nsr")
+                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt", perfusion_path2="lsr2.txt",bp_path="blood_pressure.txt",period=label,extra=begin,num_lasers=num_lasers)
+                tmp_out =out
+                tmp.append(tmp_out)
+                print("aaaaaaaa",len(tmp))
+            if len(tmp)>0:
+                print(len(tmp))
+                combined_csv = pd.concat(tmp)
+
+            csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/out" + str(flname) + ".csv"
+            combined_csv.to_csv(csv, index=False)
 
 sys.exit()
