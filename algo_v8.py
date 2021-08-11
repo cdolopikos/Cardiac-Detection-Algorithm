@@ -130,7 +130,7 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     output = []
 
     stats = {
-        # "Global Time": 0,
+        "Global Time": 0,
              "BPM": 0,
              "EGM Mean RV": 0,
              "EGM STD RV": 0,
@@ -141,8 +141,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
              "BP Estimat": 0,
              "BP Estimat2": 0,
              # "BP": 0,
-             # "Max Actual BP": 0,
-             # "Mean Actual BP": 0,
+             "Max Actual BP": 0,
+             "Mean Actual BP": 0,
              "Per Mean": 0,
              "Per Mean2": 0,
              "Per STD": 0,
@@ -283,10 +283,9 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
 
 
             update_dict = {
-
+                "Global Time": (global_time_of_beat + extra),
                 "Max Actual BP": max_bp_interval,
                            "Mean Actual BP": mean_bp_interval,
-                           "Global Time": (global_time_of_beat+extra),
                            "BPM": bpm_interval,
                            "EGM Mean RV": egmMean_interval,
                            "EGM STD RV": egmSTD_interval,
