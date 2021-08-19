@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 # path = os.path.dirname(os.getcwd()) + '/pr_data/Preprocessed_data/combined_csv.csv'
 # path = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/paok.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv"
-path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/realistic test/outvtfi0014_vvi_160_01_09_02_2021_122951_.csv"
+path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csvlaser_1.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/testing_combined_csv.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0016_vvi160_01_16_03_2021_152035_.csv"
 

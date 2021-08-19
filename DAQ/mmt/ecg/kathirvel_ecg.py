@@ -4,11 +4,10 @@ import scipy.signal
 import scipy.ndimage
 
 
-def kathirvel_ecg(
-        ecg,  # The raw ECG signal
+def kathirvel_ecg(ecg,  # The raw ECG signal
         rate,  # Sampling rate in HZ
         # Window size in seconds to use for
-        ransac_window_size=1.99,
+        ransac_window_size=2.8,
         # Low frequency of the band pass filter
         lowfreq=5.0,
         # High frequency of the band pass filter
