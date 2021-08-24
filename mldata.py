@@ -8,13 +8,14 @@ from sklearn.model_selection import train_test_split
 # path = os.path.dirname(os.getcwd()) + '/pr_data/Preprocessed_data/combined_csv.csv'
 # path = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/paok.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv"
-path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csvlaser_1.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csvlaser_2.csv"
+path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csvlaser_1.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/testing_combined_csv.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0016_vvi160_01_16_03_2021_152035_.csv"
 
 # gets preprocessed data from csv and returns a dataframe
 def setData(pth):
-    df = pd.read_csv(pth, dtype='float32')
+    df = pd.read_csv(pth)
     df = df.replace('#', '')
     # df = df.sample(frac=1).reset_index(drop=True)
     return df

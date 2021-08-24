@@ -50,7 +50,7 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
 
 
 
-def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_lasers,extra):
+def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_lasers,extra, treat):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     PERFUSION_PATH2 = perfusion_path2
@@ -160,7 +160,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
              "Magic Laser":0,
              "Perfusion Amplitude2":0,
              "Magic Laser 2":0,
-             "Diagnosis": period}
+             "Diagnosis": period,
+             "Treatment": treat}
     elif num_lasers == 1:
         stats = {
         "Global Time": 0,
@@ -183,7 +184,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
              "Quality of Perfusion":0,
              "Perfusion Amplitude":0,
              "Magic Laser":0,
-             "Diagnosis": period}
+             "Diagnosis": period,
+            "Treatment":treat}
 
     start = 0
     rr_interval = 1000
@@ -202,11 +204,13 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
             per_out = perfusion_det.detect_new_data()
             if np.mean(per_out)<2:
                 per_out=per_out*100
+            per_out=np.log10(per_out)
             if num_lasers>1:
                 perfusion_det2.load_new_data(perfusion2)
                 per_out2 = perfusion_det2.detect_new_data()
                 if np.mean(per_out2)<2:
                     per_out2=per_out2*100
+                per_out2=np.log10(per_out2)
             # per_out=np.log(per_out)
             bp_det.load_new_data(bpdata)
             bp_out = bp_det.detect_new_data()
@@ -398,17 +402,17 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
                     bp_inteerval=0
                     theta=0
 
-                if np.isinf(np.log(perfusion_amplitude)):
-                    perfusion_amplitude=perfusion_amplitude
-                else:
-                    perfusion_amplitude=np.log(perfusion_amplitude)
+                # if np.isinf(np.log(perfusion_amplitude)):
+                #     perfusion_amplitude=perfusion_amplitude
+                # else:
+                #     perfusion_amplitude=np.log(perfusion_amplitude)
 
 
                 update_dict = {
                     "BP Estimat": bp_inteerval,
                                "Quality of Perfusion":abs(sim_score),
                                "Perfusion Amplitude": abs(perfusion_amplitude),
-                               "Magic Laser": np.log10(abs(perfusion_amplitude)),
+                               "Magic Laser": ((perfusion_amplitude)),
                                "Current Perfusion Grad": (theta),
                                "Per Mean": perfusion_mean,
                                "Per STD": perfusion_sd,
@@ -559,7 +563,7 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
                     "BP Estimat": bp_inteerval,
                     "Quality of Perfusion": abs(sim_score),
                     "Perfusion Amplitude": abs(perfusion_amplitude),
-                    "Magic Laser": ((perfusion_amplitude)),
+                    "Magic Laser": ((perfusion_amplitude*10)),
                     "Current Perfusion Grad": (theta),
                     "Per Mean": perfusion_mean,
                     "Per STD": perfusion_sd,
@@ -690,8 +694,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     return output
 
 # # #
-# if __name__ == '__main__':
-#     output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=1)
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
-# #     print("Done")
+if __name__ == '__main__':
+    output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=1)
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
+#     print("Done")

@@ -12,20 +12,25 @@ database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/database2.csv"
 path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/New_unzipped"
 count = 0
 os.chdir(path)
-
+score =0
 for f in glob.glob("*"):
     tmp = []
     flname = f.lower().split(".zip")[0]
-    print("f", f)
+    # print("f", f)
     count += 1
-    df = database.loc[database["File"] == f, ["LeadRV", "LeadShock", "ECG","Period", "Begin", "End","BP", "Laser1", "Laser2"]]
-    print(df)
+    df = database.loc[database["File"] == f, ["LeadRV", "LeadShock", "ECG","Period", "Begin", "End","BP", "Laser1", "Laser2", "BP1"]]
+    # print(df)
     if df.empty:
         continue
     else:
         if len(df)<=1:
             num_lasers=1
             for i in range(len(df)):
+                shock = str(df["BP1"])
+                if "No shock" in shock:
+                    shock="No shock"
+                elif "Shock" in shock:
+                    shock = "Shock"
                 if isinstance(df.iloc[i].loc["LeadRV"],str) or not np.isnan(df.iloc[i].loc["LeadRV"]):
                     leadRV = str(df.iloc[i].loc["LeadRV"])+".txt"
                 elif isinstance(df.iloc[i].loc["LeadShock"],str) or not np.isnan(df.iloc[i].loc["LeadShock"]):
@@ -78,7 +83,7 @@ for f in glob.glob("*"):
                     label = 1
                     print("nsr")
                 print(num_lasers)
-                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1, perfusion_path2=lsr2,bp_path=blood_pressure,period=label,num_lasers=num_lasers,extra=0)
+                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1, perfusion_path2=lsr2,bp_path=blood_pressure,period=label,num_lasers=num_lasers,extra=0, treat = shock)
                 if num_lasers ==1:
                     csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_1/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
                 else:
@@ -97,6 +102,11 @@ for f in glob.glob("*"):
                         leadRV=str(df.iloc[i].loc["LeadShock"])+".txt"
                     else:
                         leadRV = str(df.iloc[i].loc["ECG"]) + ".txt"
+                shock = str(df["BP1"])
+                if "No shock" in shock:
+                    shock="No shock"
+                elif "Shock" in shock:
+                    shock = "Shock"
                 period = df.iloc[i].loc["Period"]
                 bp = df.iloc[i].loc["BP"]
                 laser1 = df.iloc[i].loc["Laser1"]
@@ -156,7 +166,7 @@ for f in glob.glob("*"):
                 elif "NSR" in period:
                     label =1
                     print("nsr")
-                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt", perfusion_path2="lsr2.txt",bp_path="blood_pressure.txt",period=label,extra=begin,num_lasers=num_lasers)
+                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt", perfusion_path2="lsr2.txt",bp_path="blood_pressure.txt",period=label,extra=begin,num_lasers=num_lasers, treat=shock)
                 tmp_out =out
                 tmp.append(tmp_out)
                 # print("aaaaaaaa",len(tmp))
@@ -168,5 +178,9 @@ for f in glob.glob("*"):
             else:
                 csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_2/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
             combined_csv.to_csv(csv, index=False)
+    score = score+1
+    print(score,"/354")
+    print(score/354)
+
 
 sys.exit()

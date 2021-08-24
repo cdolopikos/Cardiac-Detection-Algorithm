@@ -27,6 +27,7 @@ model = svm.SVC()
 test_feature_matrix = X_test
 test_labels = Y_test
 
+# the whole signal is logged and takes min to max
 
 
 
@@ -43,21 +44,22 @@ def svmDev():
     print("FINISHED classifying. accuracy score : ")
     print(accuracy_score(test_labels, predicted_labels))
     print(len(test_labels))
-    cm=confusion_matrix(test_labels, predicted_labels, labels=(1,2,3,4))
+    # cm=confusion_matrix(test_labels, predicted_labels, labels=(1,2,3,4))
+    cm=confusion_matrix(test_labels, predicted_labels, labels=("No shock", "Shock"))
     print("cm", cm)
     # dump(model, open('svm.pkl', 'wb'))
 
 
-# for i in range(0,10):
-#     svmDev()
+for i in range(0,10):
+    svmDev()
 count=0
-md = load(open('svm.pkl', 'rb'))
-for i in range(len(X)):
-    x=np.array(X.iloc[i]).reshape((1,-1))
-    pred=md.predict(x)
-    if pred==Y.iloc[i]:
-        count=count+1
-print(count/len(Y))
+# md = load(open('svm.pkl', 'rb'))
+# for i in range(len(X)):
+#     x=np.array(X.iloc[i]).reshape((1,-1))
+#     pred=md.predict(x)
+#     if pred==Y.iloc[i]:
+#         count=count+1
+# print(count/len(Y))
 #Actual svm setup
 def supvm(att, lbl):
     print("Support Vector Machine is setting up")
