@@ -48,7 +48,12 @@ def concat():
         #
         # training_combined_csv = combined_csv.iloc[int(len(combined_csv)*0.33):]
         # training_combined_csv.to_csv( "/Users/cmdgr/OneDrive - Imperial College London/pr_data/training_combined_csv.csv", index=False, encoding='utf-8-sig')
+        if "testing" in i:
+            combined_csv.to_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/testing/combined_csv_" + str(i) + ".csv", index=False, encoding='utf-8-sig')
 
-        combined_csv.to_csv( "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv"+str(i)+".csv", index=False, encoding='utf-8-sig')
+        else:
+            combined_csv.to_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_" + str(i) + ".csv", index=False, encoding='utf-8-sig')
+
+        # combined_csv.to_csv( "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/"+str(i)+"/combined_csv"+str(i)+".csv", index=False, encoding='utf-8-sig')
 
 concat()

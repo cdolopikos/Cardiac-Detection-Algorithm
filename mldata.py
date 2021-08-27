@@ -9,7 +9,11 @@ from sklearn.model_selection import train_test_split
 # path = "/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/paok.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csvlaser_2.csv"
-path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csvlaser_1.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/testing/combined_csv_laser_1_testing.csv"
+path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_laser_1.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_laser_2 copy.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_laser_1 copy.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csvlaser_1.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/testing_combined_csv.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0016_vvi160_01_16_03_2021_152035_.csv"
 
@@ -25,10 +29,14 @@ df = setData(path)
 # print(df.shape)
 
 # x gets all attributes
-x = df.iloc[:, 0:(len(df.columns) - 1)]
+x = df.iloc[:, 0:(len(df.columns) - 2)]
+print(x)
+# x1 = df.iloc[:, 0:(len(df.columns) -2)]
 # y gets all labels
 y = df.iloc[:, -1]
+y1 = df.iloc[:, -2]
 print(y)
+print(y1)
 # split x and y into training and test
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=66)
 
