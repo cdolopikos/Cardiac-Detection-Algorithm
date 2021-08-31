@@ -57,7 +57,7 @@ def supvm(att, lbl,i):
     # train model
     model.fit(att, lbl)
     print("Support Vector Machine setting up is finished")
-    dump(model, open('svm_laser'+str(i)+'.pkl', 'wb'))
+    dump(model, open('svm_laser_laser2'+str(i)+'.pkl', 'wb'))
     # return model
 
 
@@ -73,8 +73,8 @@ for i in range(1, 3):
         Y = mldata.y1
     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
     sc = StandardScaler()
-    X_train = sc.fit_transform(X_train)
-    X_test = sc.fit_transform(X_test)
+    # X_train = sc.fit_transform(X_train)
+    # X_test = sc.fit_transform(X_test)
 
     features_matrix = X_train
     # features_matrix = X

@@ -2,13 +2,13 @@ import math
 import sys
 
 # import klaus as platform
-import algo_v8 as platform
+import algo_v9 as platform
 import numpy as np
 import pandas as pd
 import zipfile
 import glob, os
 
-database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/database2.csv")
+database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB.csv")
 path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/New_unzipped"
 count = 0
 os.chdir(path)

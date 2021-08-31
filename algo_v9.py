@@ -18,8 +18,8 @@ import time
 
 ecg = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/ecg.txt"
 lsr1 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/plethh.txt"
-# lsr2 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/qfin.txt"
-lsr2=""
+lsr2 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/qfin.txt"
+# lsr2=""
 bp = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/bpao.txt"
 
 DEBUG = True
@@ -129,63 +129,63 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     cons = []
     output = []
 
-    if num_lasers == 2:
-        stats = {
-        # "Global Time": 0,
-             "BPM": 0,
-             "EGM Mean RV": 0,
-             "EGM STD RV": 0,
-             "EGM Skewness RV": 0,
-             "EGM Kurtosis RV": 0,
-             "EGM Quality":0,
-             "R-R Interval RV": 0,
-             "BP Estimat": 0,
-             "BP Estimat2": 0,
-             # "BP": 0,
-             # "Max Actual BP": 0,
-             # "Mean Actual BP": 0,
-             "Per Mean": 0,
-             "Per Mean2": 0,
-             "Per STD": 0,
-             "Per STD2": 0,
-             "Per Skewness": 0,
-             "Per Skewness2": 0,
-             "Per Kurtosis": 0,
-             "Per Kurtosis2": 0,
-             "Current Perfusion Grad": 0,
-             "Current Perfusion Grad2": 0,
-             "Quality of Perfusion":0,
-             "Quality of Perfusion2":0,
-             "Perfusion Amplitude":0,
-             "Magic Laser":0,
-             "Perfusion Amplitude2":0,
-             "Magic Laser 2":0,
-             "Diagnosis": period,
-             "Treatment": treat}
-    elif num_lasers == 1:
-        stats = {
-        # "Global Time": 0,
-             "BPM": 0,
-             "EGM Mean RV": 0,
-             "EGM STD RV": 0,
-             "EGM Skewness RV": 0,
-             "EGM Kurtosis RV": 0,
-             "EGM Quality":0,
-             "R-R Interval RV": 0,
-             "BP Estimat": 0,
-             # "BP": 0,
-             # "Max Actual BP": 0,
-             # "Mean Actual BP": 0,
-             "Per Mean": 0,
-             "Per STD": 0,
-             "Per Skewness": 0,
-             "Per Kurtosis": 0,
-             "Current Perfusion Grad": 0,
-             "Quality of Perfusion":0,
-             "Perfusion Amplitude":0,
-             "Magic Laser":0,
-             "Diagnosis": period,
-            "Treatment":treat}
+    # if num_lasers == 2:
+    #     stats = {
+    #     # "Global Time": 0,
+    #          "BPM": 0,
+    #          "EGM Mean RV": 0,
+    #          "EGM STD RV": 0,
+    #          "EGM Skewness RV": 0,
+    #          "EGM Kurtosis RV": 0,
+    #          "EGM Quality":0,
+    #          "R-R Interval RV": 0,
+    #          "BP Estimat": 0,
+    #          "BP Estimat2": 0,
+    #          # "BP": 0,
+    #          # "Max Actual BP": 0,
+    #          # "Mean Actual BP": 0,
+    #          "Per Mean": 0,
+    #          "Per Mean2": 0,
+    #          "Per STD": 0,
+    #          "Per STD2": 0,
+    #          "Per Skewness": 0,
+    #          "Per Skewness2": 0,
+    #          "Per Kurtosis": 0,
+    #          "Per Kurtosis2": 0,
+    #          "Current Perfusion Grad": 0,
+    #          "Current Perfusion Grad2": 0,
+    #          "Quality of Perfusion":0,
+    #          "Quality of Perfusion2":0,
+    #          "Perfusion Amplitude":0,
+    #          "Magic Laser":0,
+    #          "Perfusion Amplitude2":0,
+    #          "Magic Laser 2":0,
+    #          "Diagnosis": period,
+    #          "Treatment": treat}
+    # elif num_lasers == 1:
+    stats = {
+    # "Global Time": 0,
+         "BPM": 0,
+         "EGM Mean RV": 0,
+         "EGM STD RV": 0,
+         "EGM Skewness RV": 0,
+         "EGM Kurtosis RV": 0,
+         "EGM Quality":0,
+         "R-R Interval RV": 0,
+         "BP Estimat": 0,
+         # "BP": 0,
+         # "Max Actual BP": 0,
+         # "Mean Actual BP": 0,
+         "Per Mean": 0,
+         "Per STD": 0,
+         "Per Skewness": 0,
+         "Per Kurtosis": 0,
+         "Current Perfusion Grad": 0,
+         "Quality of Perfusion":0,
+         "Perfusion Amplitude":0,
+         "Magic Laser":0,
+         "Diagnosis": period,
+        "Treatment":treat}
 
     start = 0
     rr_interval = 1000
@@ -558,6 +558,15 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
                     perfusion_amplitude2 = perfusion_amplitude2
                 else:
                     perfusion_amplitude2 = np.log10(perfusion_amplitude2)
+                if sim_score2>sim_score:
+                    sim_score = sim_score2
+                    bp_inteerval=bp_inteerval2
+                    perfusion_amplitude= perfusion_amplitude2
+                    theta=theta2
+                    perfusion_mean =perfusion_mean2
+                    perSkew=perSkew2
+                    perfusion_sd=perfusion_sd2
+                    perKurtosis=perKurtosis2
 
                 update_dict = {
                     "BP Estimat": bp_inteerval,
@@ -568,16 +577,7 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
                     "Per Mean": perfusion_mean,
                     "Per STD": perfusion_sd,
                     "Per Skewness": perSkew,
-                    "Per Kurtosis": perKurtosis,
-                    "BP Estimat2": bp_inteerval2,
-                    "Quality of Perfusion2": abs(sim_score2),
-                    "Perfusion Amplitude2": abs(perfusion_amplitude2),
-                    "Magic Laser 2": (perfusion_amplitude2),
-                    "Current Perfusion Grad2": (theta2),
-                    "Per Mean2": perfusion_mean2,
-                    "Per STD2": perfusion_sd2,
-                    "Per Skewness2": perSkew2,
-                    "Per Kurtosis2": perKurtosis2}
+                    "Per Kurtosis": perKurtosis}
 
             interval_stats.update(update_dict)
             ecg_data.append([bpm_interval,rr_interval])
@@ -695,7 +695,7 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
 
 # # #
 if __name__ == '__main__':
-    output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=1,treat="IDK")
+    output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK")
     output_pd = pd.DataFrame(output)
     output_pd.to_csv("paok.csv")
 #     print("Done")

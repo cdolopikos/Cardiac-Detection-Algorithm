@@ -3,7 +3,8 @@ import glob
 import pandas as pd
 import numpy as np
 
-lasers=["laser_1","laser_2","laser_2_testing", "laser_1_testing"]
+# lasers=["laser_1","laser_2","laser_2_testing", "laser_1_testing"]
+lasers=["combined","combined testing"]
 
 
 def concat():
@@ -48,11 +49,11 @@ def concat():
         #
         # training_combined_csv = combined_csv.iloc[int(len(combined_csv)*0.33):]
         # training_combined_csv.to_csv( "/Users/cmdgr/OneDrive - Imperial College London/pr_data/training_combined_csv.csv", index=False, encoding='utf-8-sig')
-        if "testing" in i:
-            combined_csv.to_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/testing/combined_csv_" + str(i) + ".csv", index=False, encoding='utf-8-sig')
+        if "testing" not in i:
+            combined_csv.to_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined/combined_csv_" + str(i) + ".csv", index=False, encoding='utf-8-sig')
 
         else:
-            combined_csv.to_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_" + str(i) + ".csv", index=False, encoding='utf-8-sig')
+            combined_csv.to_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined testing/combined_csv_" + str(i) + ".csv", index=False, encoding='utf-8-sig')
 
         # combined_csv.to_csv( "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/"+str(i)+"/combined_csv"+str(i)+".csv", index=False, encoding='utf-8-sig')
 
