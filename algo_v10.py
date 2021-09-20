@@ -51,7 +51,7 @@ def lag_calc(egm_start_time, egm_end_time, signal_with_lag):
 
 
 
-def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_lasers,extra, treat):
+def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_lasers,extra, treat, flname,patient, bp1, hrs):
     ELECTROGRAM_PATH = electrogram_path
     PERFUSION_PATH = perfusion_path
     PERFUSION_PATH2 = perfusion_path2
@@ -72,8 +72,9 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
 
 
     if not DEBUG:
+        # pg.setConfigOption('background', 'w')
         win = pg.GraphicsWindow()
-        pg.setConfigOption('background', 'w')
+
         #
         p1 = win.addPlot(row=1, col=0)
         p2 = win.addPlot(row=2, col=0)
@@ -85,26 +86,26 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
         p8 = win.addPlot(row=1, col=2)
         p9 = win.addPlot(row=2, col=2)
 
-        curve1 = p1.plot()
+        curve1 = p1.plot(pen=pg.mkPen('g'))
         dot1 = p1.plot(pen=None, symbol="o")
-        curve2 = p2.plot()
-        curve3 = p3.plot()
-        curve4 = p4.plot()
-        curve5 = p5.plot()
-        curve6 = p5.plot()
-        curve7 = p5.plot()
-        curve8 = p5.plot()
-        curve9 = p5.plot()
-        curve10 = p5.plot()
-        curve11 = p6.plot()
-        curve12 = p8.plot()
-        curve13 = p8.plot()
-        curve14 = p8.plot()
-        curve15 = p8.plot()
-        curve16 = p8.plot()
-        curve17 = p8.plot()
-        curve18 = p9.plot()
-        curve19 = p7.plot()
+        curve2 = p2.plot(pen=pg.mkPen('r'))
+        curve3 = p3.plot(pen=pg.mkPen('g'))
+        curve4 = p4.plot(pen=pg.mkPen('r'))
+        curve5 = p5.plot(pen=pg.mkPen('r'))
+        curve6 = p5.plot(pen=pg.mkPen('b'))
+        curve7 = p5.plot(pen=pg.mkPen('c'))
+        curve8 = p5.plot(pen=pg.mkPen('m'))
+        curve9 = p5.plot(pen=pg.mkPen('y'))
+        curve10 = p5.plot(pen=pg.mkPen('k'))
+        curve11 = p6.plot(pen=pg.mkPen('w'))
+        curve12 = p8.plot(pen=pg.mkPen('r'))
+        curve13 = p8.plot(pen=pg.mkPen('b'))
+        curve14 = p8.plot(pen=pg.mkPen('c'))
+        curve15 = p8.plot(pen=pg.mkPen('m'))
+        curve16 = p8.plot(pen=pg.mkPen('y'))
+        curve17 = p8.plot(pen=pg.mkPen('k'))
+        curve18 = p9.plot(pen=pg.mkPen('w'))
+        curve19 = p7.plot(pen=pg.mkPen('r'))
         dot2 = p2.plot(pen=None, symbol="x")
         dot3 = p2.plot(pen=None, symbol="o")
         dot4 = p4.plot(pen=None, symbol="o")
@@ -166,6 +167,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     #          "Treatment": treat}
     # elif num_lasers == 1:
     stats = {
+        "Filename":flname,
+        "Patient":patient,
     "Global Time": 0,
          "BPM": 0,
          "EGM Mean RV": 0,
@@ -187,7 +190,10 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
          "Perfusion Amplitude":0,
          "Magic Laser":0,
          "Diagnosis": period,
-        "Treatment":treat}
+        "Treatment":treat,
+        "Rhythm":treat,
+    "BP1":bp1,
+    "HRS":hrs}
 
     start = 0
     rr_interval = 1000
@@ -716,8 +722,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     return output
 
 # # #
-# if __name__ == '__main__':
-#     output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK")
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
-#     print("Done")
+if __name__ == '__main__':
+    output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK")
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
+    print("Done")

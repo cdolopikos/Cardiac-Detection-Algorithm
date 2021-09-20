@@ -19,10 +19,10 @@ class ElectrogramDetector:
 
     def detect_new_data(self):
         buffer = self.buffer
-        out = filters.butter_lowpass_filter(data=buffer, cutoff=self.cutoff, fs=self.fs, order=self.order)
-        out = filters.butter_highpass_filter(data=out, cutoff=self.cutoff, fs=self.fs, order=self.order)
-        out_mean = np.mean(out)
-        out = np.abs(out - out_mean)
+        out1 = filters.butter_lowpass_filter(data=buffer, cutoff=self.cutoff, fs=self.fs, order=self.order)
+        out2 = filters.butter_highpass_filter(data=out1, cutoff=self.cutoff, fs=self.fs, order=self.order)
+        out_mean = np.mean(out2)
+        out = np.abs(out2 - out_mean)
         out = np.convolve(out, np.ones(111, dtype=np.int), 'same')
         raw = buffer[100:]
         return out, raw

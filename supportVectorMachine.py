@@ -1,6 +1,8 @@
 from pickle import dump, load
 import numpy as np
 from sklearn.calibration import CalibratedClassifierCV
+from sklearn.kernel_approximation import RBFSampler
+from sklearn.linear_model import SGDClassifier
 from sklearn.svm import SVC
 import mldata
 from sklearn.model_selection import train_test_split
@@ -62,7 +64,11 @@ def supvm(att, lbl,i):
 
 
 
+
+
 X = mldata.getAll_attributes()
+# Y = mldata.y
+# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
 for i in range(1, 3):
     if i == 1:
         # X = mldata.x1
@@ -86,4 +92,11 @@ for i in range(1, 3):
     for j in range(0, 10):
         svmDev(i)
     supvm(features_matrix, labels,i)
-    print(i)
+#     print(i)
+
+# rbf_feature = RBFSampler(gamma=0.1, random_state=1)
+# X_features = rbf_feature.fit_transform(X)
+# clf = SGDClassifier(max_iter=5)
+# clf.fit(X_train, Y_train)
+#
+# print("poutana",clf.score(X_test, Y_test))

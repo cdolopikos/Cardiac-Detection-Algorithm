@@ -19,9 +19,10 @@ laser = 2
 
 def getML_treatment(instance,laser):
     if laser ==1:
-        ml = load(open('svm_laser1.pkl', 'rb'))
+        # ml = load(open('svm_laser1.pkl', 'rb'))
+        ml = load(open('rdf_laser_laser1_paok.pkl', 'rb'))
     elif laser ==2:
-        ml = load(open('svm_laser_laser21.pkl', 'rb'))
+        ml = load(open('rdf_laser_laser1_paok.pkl', 'rb'))
     ml_based_treatment = ml.predict(instance)
     ml_based_prob = ml.predict_proba(instance)
     print("Paok",ml_based_treatment,ml_based_prob)
@@ -30,9 +31,11 @@ def getML_treatment(instance,laser):
 
 def getML_diagnosis(instance, laser):
     if laser ==1:
-        ml = load(open('svm_laser2.pkl', 'rb'))
+        # ml = load(open('svm_laser2.pkl', 'rb'))
+        ml = load(open('rdf_laser_laser2_paok.pkl', 'rb'))
     elif laser ==2:
-        ml = load(open('svm_laser_laser22.pkl', 'rb'))
+        # ml = load(open('svm_laser_laser22.pkl', 'rb'))
+        ml = load(open('rdf_laser_laser2_paok.pkl', 'rb'))
     ml_based_decision = ml.predict(instance)
     print(ml_based_decision[0])
     return (ml_based_decision[0])
@@ -97,12 +100,12 @@ for i in range(len(instances)):
         print("Hooray")
         ml_treat,ml_prob=getML_treatment(X,laser)
         # final_treat=ml_treat
-        if ml_treat == "Shock" and bpd<0:
+        if ml_treat == "Shock" and bpd>0:
             print("nai")
             final_treat="Shock"
-        elif ml_treat == "No Shock" and bpd>0:
+        elif ml_treat == "No Shock" and bpd<0:
             final_treat = "No Shock"
-        elif ml_treat == "Shock" and bpd>0:
+        elif ml_treat == "Shock" and bpd<0:
             print(ml_prob[0][1], "xyn")
             # bpd = 1.6 * bpd
 
@@ -116,7 +119,7 @@ for i in range(len(instances)):
                 final_treat="Shock"
             else:
                 final_treat="No Shock"
-        elif ml_treat == "No Shock" and bpd<0:
+        elif ml_treat == "No Shock" and bpd>0:
             # bpd = 1.3 * bpd
             if abs(bpd) > 1.5:
                 bpd = 2.5*bpd
@@ -139,6 +142,9 @@ for i in range(len(instances)):
         tmp.append([ml_prob,ml_treat, ml_diag, final_treat, bpd, treatment[i]])
         print(tmp)
     print(ct / len(treatment))
+
+dt=pd.DataFrame(tmp)
+dt.to_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/tmp.csv")
     # print(tmp)
 #     print(ml_dec," ", diagnosis[i])
 #     if diagnosis[i] == ml_dec:

@@ -8,7 +8,7 @@ import numpy as np
 import random
 
 
-os.chdir("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_1")
+os.chdir("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_2")
 cwd = os.getcwd()
 print(cwd)
 extension = 'csv'

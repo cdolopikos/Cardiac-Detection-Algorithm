@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0015_vvi_set01_200_16_02_2021_121627_.csv")
-df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0015_vvi_set01_140_16_02_2021_120646_.csv")
+df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/combined/out_vtfi0015_vvi_set02_140_16_02_2021_125253__laser2.csv")
 # df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0014_vvi_160_01_09_02_2021_122951_.csv")
 # df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0014_vvi_180_01_09_02_2021_122759_.csv")
 # df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0014_vvi_200_01_09_02_2021_123325_.csv")
@@ -26,18 +26,18 @@ df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Prepro
 # todo df= pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/outvtfi0017_test_aai140_27_04_2021_145324_.csv")
 
 # df = pd.read_csv("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv")
-x=df["Max Actual BP"]
+x=df["BPM"]
 y=df["BP Estimat"]
-df=df[["Max Actual BP", "BP Estimat","BPM", "Per STD", "Decision"]]
+df=df[[ "BP Estimat","BPM", "Per STD", "Diagnosis"]]
 
 # plt.scatter(df['Max Actual BP'], df['BP Estimat'])
 # plt.scatter(df['Max Actual BP'], np.log10(df["Current Perfusion Grad"] * df["Quality of Perfusion"] * df["Perfusion Amplitude"] * df["R-R Interval RV"]))
 # plt.show()
-groups = df.groupby('Decision')
+groups = df.groupby('Diagnosis')
 for name, group in groups:
     print(name)
-    print(group["Max Actual BP"])
-    plt.plot(group["Max Actual BP"] , np.log10((group["BP Estimat"])), marker='o', linestyle='', markersize=1, label=name)
+    print(group["BPM"])
+    plt.plot(group["BPM"] , np.log10((group["BP Estimat"])), marker='o', linestyle='', markersize=1, label=name)
 
 #
 plt.legend()

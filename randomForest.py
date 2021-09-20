@@ -1,4 +1,5 @@
 import numpy as np
+from pickle import dump, load
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import RandomizedSearchCV
@@ -16,8 +17,8 @@ def rdfDev():
     y = mldata.getAll_labels()
     x = mldata.getAll_attributes()
     sc = StandardScaler()
-    x_train = sc.fit_transform(x_train)
-    x_test = sc.fit_transform(x_test)
+    # x_train = sc.fit_transform(x_train)
+    # x_test = sc.fit_transform(x_test)
     rfc = RandomForestClassifier()
     rfc.fit(x_train, y_train)
     rfc_predict = rfc.predict(x_test)
@@ -58,20 +59,29 @@ def rdfDev():
     print('\n')
     print("=== Mean AUC Score ===")
     print("Mean AUC Score - Random Forest: ", rfc_cv_score.mean())
+
     # cm = confusion_matrix(rfc_predict, y_test, labels=(1, 2, 3, 4, 5))
     # print("cm", cm)
+
     return rfc
 
 
-rdfDev()
+# rdfDev()
 
 
 # Random Forest Classifier setup later used
 def randonf(att, lbl):
     print("Random Forest is setting up")
-    sc = StandardScaler()
-    attribute = sc.fit_transform(att)
+    # sc = StandardScaler()
+    # attribute = sc.fit_transform(att)
     rfc = rdfDev()
-    rfc.fit(attribute, lbl)
+    rfc.fit(att, lbl)
+    dump(rfc, open('rdf_laser_laser2_paok.pkl', 'wb'))
     print("Random Forest setting up is finished")
+    print(rfc.get_params())
     return rfc
+
+y = mldata.getAll_labels()
+x = mldata.getAll_attributes()
+
+randonf(x,y)

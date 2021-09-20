@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csvlaser_2.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/testing/combined_csv_laser_1_testing.csv"
-# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined testing/combined_csv_combined.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined testing/combined_csv_combined testing.csv"
 path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined/combined_csv_combined.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_laser_2 copy.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_laser_1 copy.csv"
@@ -39,7 +39,7 @@ y1 = df.iloc[:, -2]
 print(y)
 print(y1)
 # split x and y into training and test
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=66)
+x_train, x_test, y_train, y_test = train_test_split(x, y1, test_size=0.33, random_state=66)
 
 # for i in range(len(y)):
 #     print(y[i])
@@ -70,7 +70,7 @@ def getAll_attributes():
 
 
 def getAll_labels():
-    return y
+    return y1
 
 
 def pdtoTensor(data):

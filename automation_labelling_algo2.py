@@ -2,13 +2,14 @@ import math
 import sys
 
 # import klaus as platform
-import algo_v9 as platform
+import algo_v10 as platform
 import numpy as np
 import pandas as pd
 import zipfile
 import glob, os
 
 database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB.csv")
+print(database)
 path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/New_unzipped"
 count = 0
 os.chdir(path)
@@ -24,7 +25,7 @@ for f in glob.glob("*"):
     flname = f.lower().split(".zip")[0]
     # print("f", f)
     count += 1
-    df = database.loc[database["File"] == f, ["LeadRV", "LeadShock", "ECG","Period", "Begin", "End","BP", "Laser1", "Laser2", "Rhythm"]]
+    df = database.loc[database["File"] == f, ["Patient","File","LeadRV", "LeadShock", "ECG","Period", "Begin", "End","BP", "Laser1", "Laser2", "Rhythm", "BP1", "HRS"]]
     # print(df["Rhythm"])
 
     if df.empty:
@@ -34,6 +35,8 @@ for f in glob.glob("*"):
             num_lasers=1
             for i in range(len(df)):
                 shock = str(df.iloc[i]["Rhythm"])
+                BP1 = str(df.iloc[i]["BP1"])
+                hrs = str(df.iloc[i]["HRS"])
                 print(shock)
                 # if "No shock" in shock:
                 #     shock="No shock"
@@ -92,7 +95,9 @@ for f in glob.glob("*"):
                     label = 1
                     print("nsr")
                 print(num_lasers)
-                out = platform.main(electrogram_path=ldrv,perfusion_path=lsr1, perfusion_path2=lsr2,bp_path=blood_pressure,period=label,num_lasers=num_lasers,extra=0, treat = shock)
+                patients=df.iloc[i].loc["Patient"]
+                file=df.iloc[i].loc["File"]
+                out = platform.main(patient=patients,flname=file,electrogram_path=ldrv,perfusion_path=lsr1, perfusion_path2=lsr2,bp_path=blood_pressure,period=label,num_lasers=num_lasers,extra=0, treat = shock, bp1=BP1, hrs=hrs)
                 if num_lasers ==1:
                     csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_1/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
                 else:
@@ -113,6 +118,8 @@ for f in glob.glob("*"):
                         leadRV = str(df.iloc[i].loc["ECG"]) + ".txt"
                 shock = str(df.iloc[i]["Rhythm"])
                 print(shock)
+                BP1 = str(df.iloc[i]["BP1"])
+                hrs = str(df.iloc[i]["HRS"])
                 # if "No shock" in shock:
                 #     shock="No shock"
                 # elif "Shock" in shock:
@@ -176,7 +183,9 @@ for f in glob.glob("*"):
                 elif "NSR" in period:
                     label =1
                     print("nsr")
-                out = platform.main(electrogram_path="ldrv.txt",perfusion_path="lsr1.txt", perfusion_path2="lsr2.txt",bp_path="blood_pressure.txt",period=label,extra=begin,num_lasers=num_lasers, treat=shock)
+                patients=df.iloc[i].loc["Patient"]
+                file=df.iloc[i].loc["File"]
+                out = platform.main(patient=patients,flname=file,electrogram_path="ldrv.txt",perfusion_path="lsr1.txt", perfusion_path2="lsr2.txt",bp_path="blood_pressure.txt",period=label,extra=begin,num_lasers=num_lasers, treat=shock,  bp1=BP1, hrs=hrs)
                 tmp_out =out
                 tmp.append(tmp_out)
                 # print("aaaaaaaa",len(tmp))

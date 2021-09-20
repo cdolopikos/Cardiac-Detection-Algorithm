@@ -18,8 +18,9 @@ class PerfusionDetector:
 
     def detect_new_data(self):
         buffer = self.buffer
+        raw=buffer
         buffer = (buffer - min(buffer)) / (max(buffer) - min(buffer))
         window_size = 100
         window = np.ones(window_size) / float(window_size)
         out = np.sqrt(np.convolve(buffer, window, 'same'))
-        return out
+        return out, raw
