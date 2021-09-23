@@ -1,28 +1,21 @@
 import collections
-import math
 import statistics
-import operator
 from scipy.stats import skew, kurtosis
 import pandas as pd
-import sys
-from PyQt6.QtWidgets import QTableWidget, QVBoxLayout, QTableWidgetItem, QApplication
+from PyQt6.QtWidgets import QTableWidget
 from PyQt6 import QtGui
 import pyqtgraph as pg
 import numpy as np
-from scipy.signal import butter, filtfilt, find_peaks, lfilter  # Filter requirements.
-from pickle import load
-import filters, data_reader, perfusion_detector, bp_detector,electrogram_detector
-import magic_laser as mgl
-from scipy import fftpack
-import time
-import matplotlib.pyplot as plt
+from scipy.signal import find_peaks # Filter requirements.
+import  data_reader, perfusion_detector, bp_detector,electrogram_detector
+
 
 ecg = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/ecg.txt"
 lsr1 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/plethh.txt"
 lsr2 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/qfin.txt"
 bp = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/bpao.txt"
 
-DEBUG = True
+DEBUG = False
 
 STEP_SIZE = 200
 BP_LAG = 200
@@ -55,7 +48,6 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     PERFUSION_PATH = perfusion_path
     PERFUSION_PATH2 = perfusion_path2
     BP_PATH = bp_path
-    model = load(open('/Users/cmdgr/OneDrive - Imperial College London/!Project/AAD_1/model.pkl', 'rb'))
     electrogram = data_reader.Data_Reader(data_path=ELECTROGRAM_PATH)
     perfusion = data_reader.Data_Reader(data_path=PERFUSION_PATH)
     try:
@@ -118,17 +110,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     mat2 = collections.deque(maxlen=6)
     mat_pks = collections.deque(maxlen=50)
 
-    last_ecg_peak_time = 0
 
-    # print(mat_pks)
-    ecg_peaks_total = []
-    ecg_pks = []
-    per_pks = []
     count = 0
-    # count=1200
-    hrb = 0
-    count = 0
-    cons = []
     output = []
 
     stats = {
@@ -163,7 +146,6 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     start = 0
     rr_interval = 1000
     finish = 400
-    # tmp=[]
     ecg_data = [None] * 20
     while True:
         # Setting up the data instreams
@@ -611,8 +593,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     return output
 
 # # # #
-# if __name__ == '__main__':
-#     output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK")
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
-#     print("Done")
+if __name__ == '__main__':
+    output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK",flname="d",patient="a",bp1="1",hrs="q")
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
+    print("Done")
