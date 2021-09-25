@@ -5,18 +5,23 @@ import pandas as pd
 import zipfile
 import glob, os
 
-database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB.csv")
+# database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB.csv")
+database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB copy.csv")
 print(database)
-path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/New_unzipped"
+# path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/New_unzipped"
+path= "/Users/cmdgr/Dropbox/AAD-Documents/Traces/All_data"
 count = 0
 os.chdir(path)
 score =0
-names = database["File"]
+names = database["Patient"]
 tempo=[]
 for name in names:
     if name not in tempo:
         tempo.append(name)
 
+
+
+# print(len(tempo))
 for f in glob.glob("*"):
     tmp = []
     flname = f.lower().split(".zip")[0]
@@ -51,6 +56,7 @@ for f in glob.glob("*"):
                 laser1 = df.iloc[i].loc["Laser1"]
                 laser2 = df.iloc[i].loc["Laser2"]
                 if not isinstance(bp, str):
+
                     continue
                 if not isinstance(laser1, str):
                     continue
@@ -91,6 +97,8 @@ for f in glob.glob("*"):
                 elif "NSR" in period:
                     label = 1
                     print("nsr")
+                elif "Recovery" in period:
+                    label =1
                 elif "VF" in period:
                     label = 5
                     print("VF")
@@ -182,6 +190,8 @@ for f in glob.glob("*"):
                 elif "NSR" in period:
                     label =1
                     print("nsr")
+                elif "Recovery" in period:
+                    label =1
                 elif "VF" in period:
                     label =5
                     print("VF")

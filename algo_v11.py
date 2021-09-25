@@ -15,7 +15,7 @@ lsr1 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_1
 lsr2 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/qfin.txt"
 bp = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/bpao.txt"
 
-DEBUG = False
+DEBUG = True
 
 STEP_SIZE = 200
 BP_LAG = 200
@@ -50,11 +50,14 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     BP_PATH = bp_path
     electrogram = data_reader.Data_Reader(data_path=ELECTROGRAM_PATH)
     perfusion = data_reader.Data_Reader(data_path=PERFUSION_PATH)
+    bpdata = data_reader.Data_Reader(data_path=BP_PATH)
+    print(ELECTROGRAM_PATH)
+    print(PERFUSION_PATH)
     try:
         perfusion2 = data_reader.Data_Reader(data_path=PERFUSION_PATH2)
     except:
         pass
-    bpdata = data_reader.Data_Reader(data_path=BP_PATH)
+
 
     electrogram_det = electrogram_detector.ElectrogramDetector()
     perfusion_det = perfusion_detector.PerfusionDetector()
@@ -593,8 +596,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     return output
 
 # # # #
-if __name__ == '__main__':
-    output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK",flname="d",patient="a",bp1="1",hrs="q")
-    output_pd = pd.DataFrame(output)
-    output_pd.to_csv("paok.csv")
-    print("Done")
+# if __name__ == '__main__':
+#     output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK",flname="d",patient="a",bp1="1",hrs="q")
+#     output_pd = pd.DataFrame(output)
+#     output_pd.to_csv("paok.csv")
+#     print("Done")

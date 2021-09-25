@@ -1,14 +1,14 @@
 import math
 import sys
 
-# import klaus as platform
+
 import algo_v11 as platform
 import numpy as np
 import pandas as pd
 import zipfile
 import glob, os
 
-database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB.csv")
+database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB copy.csv")
 print(database)
 path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/New_unzipped"
 count = 0
@@ -31,6 +31,7 @@ for f in glob.glob("*"):
     if df.empty:
         continue
     else:
+        print(f)
         if len(df)<=1:
             num_lasers=1
             for i in range(len(df)):
@@ -94,6 +95,13 @@ for f in glob.glob("*"):
                 elif "NSR" in period:
                     label = 1
                     print("nsr")
+                elif "Recovery" in period:
+                    label =1
+                    print("nsr")
+                elif "VF" in period:
+                    label =5
+                    print("VF")
+
                 print(num_lasers)
                 patients=df.iloc[i].loc["Patient"]
                 file=df.iloc[i].loc["File"]
@@ -183,6 +191,12 @@ for f in glob.glob("*"):
                 elif "NSR" in period:
                     label =1
                     print("nsr")
+                elif "Recovery" in period:
+                    label =1
+                    print("nsr")
+                elif "VF" in period:
+                    label =5
+                    print("VF")
                 patients=df.iloc[i].loc["Patient"]
                 file=df.iloc[i].loc["File"]
                 out = platform.main(patient=patients,flname=file,electrogram_path="ldrv.txt",perfusion_path="lsr1.txt", perfusion_path2="lsr2.txt",bp_path="blood_pressure.txt",period=label,extra=begin,num_lasers=num_lasers, treat=shock,  bp1=BP1, hrs=hrs)
