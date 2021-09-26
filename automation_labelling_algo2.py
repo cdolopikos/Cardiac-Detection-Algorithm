@@ -8,9 +8,11 @@ import pandas as pd
 import zipfile
 import glob, os
 
-database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB copy.csv")
+# database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/only_vf.csv")
+database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB.csv")
+# database = pd.read_csv("/Users/cmdgr/Dropbox/AAD-Documents/Traces/BIG_DB copy 2.csv")
 print(database)
-path= "/Users/cmdgr/OneDrive - Imperial College London/pr_data/New_unzipped"
+path= "/Users/cmdgr/Dropbox/AAD-Documents/Traces/All_data"
 count = 0
 os.chdir(path)
 score =0
@@ -128,6 +130,7 @@ for f in glob.glob("*"):
                 print(shock)
                 BP1 = str(df.iloc[i]["BP1"])
                 hrs = str(df.iloc[i]["HRS"])
+
                 # if "No shock" in shock:
                 #     shock="No shock"
                 # elif "Shock" in shock:
@@ -158,6 +161,7 @@ for f in glob.glob("*"):
                 laser1 = str(laser1) + ".txt"
                 laser2 = str(laser2) + ".txt"
                 ldrv = (pd.read_csv(zf.open(leadRV)))[begin:end]
+                print("PAOK", len(ldrv))
                 ldrv = ldrv.to_csv("ldrv.txt",index=False)
 
                 lsr1 = (pd.read_csv(zf.open(laser1)))[begin:end]

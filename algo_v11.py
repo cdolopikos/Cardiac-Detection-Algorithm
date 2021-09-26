@@ -10,10 +10,10 @@ from scipy.signal import find_peaks # Filter requirements.
 import  data_reader, perfusion_detector, bp_detector,electrogram_detector
 
 
-ecg = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/ecg.txt"
-lsr1 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/plethh.txt"
-lsr2 = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/qfin.txt"
-bp = "/Users/cmdgr/OneDrive - Imperial College London/VTFI0015_VVI_SET01_140_16_02_2021_120646_/bpao.txt"
+ecg = "/Users/cmdgr/Dropbox/AAD-Documents/Traces/All_data/DKDFT024_09_05_2016_132015_dft_x2/ecg.txt"
+lsr1 = "/Users/cmdgr/Dropbox/AAD-Documents/Traces/All_data/DKDFT024_09_05_2016_132015_dft_x2/plethi.txt"
+lsr2 = "/Users/cmdgr/Dropbox/AAD-Documents/Traces/All_data/DKDFT024_09_05_2016_132015_dft_x2/plethr.txt"
+bp = "/Users/cmdgr/Dropbox/AAD-Documents/Traces/All_data/DKDFT024_09_05_2016_132015_dft_x2/BP.txt"
 
 DEBUG = True
 
