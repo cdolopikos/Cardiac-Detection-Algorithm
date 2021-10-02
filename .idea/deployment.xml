@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="cmdgr@34.105.230.10:22 (2)" remoteFilesAllowedToDisappearOnAutoupload="false">
-    <serverData>
-      <paths name="cmdgr@34.105.230.10:22">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/tmp/pycharm_project_814" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-      <paths name="cmdgr@34.105.230.10:22 (2)">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/tmp/pycharm_project_997" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
-    </serverData>
+  <component name="PublishConfigData" autoUpload="Always" remoteFilesAllowedToDisappearOnAutoupload="false">
     <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>
