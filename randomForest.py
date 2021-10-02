@@ -16,7 +16,7 @@ def rdfDev():
     y_test = mldata.getLabel_test()
     y = mldata.getAll_labels()
     x = mldata.getAll_attributes()
-    sc = StandardScaler()
+    # sc = StandardScaler()
     # x_train = sc.fit_transform(x_train)
     # x_test = sc.fit_transform(x_test)
     rfc = RandomForestClassifier()
@@ -29,7 +29,7 @@ def rdfDev():
     n_estimators = [int(x) for x in np.linspace(start=200, stop=2000, num=10)]  # number of features at every split
     max_features = ['auto', 'sqrt']
     # max depth
-    max_depth = [int(x) for x in np.linspace(100, 500, num=11)]
+    max_depth = [int(x) for x in np.linspace(100, 1000, num=11)]
     max_depth.append(None)
     # create random grid
     random_grid = {'n_estimators': n_estimators, 'max_features': max_features, 'max_depth': max_depth}
@@ -76,7 +76,7 @@ def randonf(att, lbl):
     # attribute = sc.fit_transform(att)
     rfc = rdfDev()
     rfc.fit(att, lbl)
-    dump(rfc, open('rdf_laser_laser2_paok.pkl', 'wb'))
+    dump(rfc, open('rdf_condition_based.pkl', 'wb'))
     print("Random Forest setting up is finished")
     print(rfc.get_params())
     return rfc

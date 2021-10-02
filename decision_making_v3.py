@@ -20,24 +20,27 @@ laser = 2
 def getML_treatment(instance,laser):
     if laser ==1:
         # ml = load(open('svm_laser1.pkl', 'rb'))
-        ml = load(open('rdf_laser_laser1_paok.pkl', 'rb'))
+        ml = load(open('svm_treatment_based.pkl', 'rb'))
     elif laser ==2:
-        ml = load(open('rdf_laser_laser1_paok.pkl', 'rb'))
+        ml = load(open('svm_treatment_based.pkl', 'rb'))
     ml_based_treatment = ml.predict(instance)
     ml_based_prob = ml.predict_proba(instance)
-    print("Paok",ml_based_treatment,ml_based_prob)
+
+    # print("Paok",ml_based_treatment,ml_based_prob)
     return (ml_based_treatment[0]),ml_based_prob
 
 
 def getML_diagnosis(instance, laser):
+    print(instance)
     if laser ==1:
         # ml = load(open('svm_laser2.pkl', 'rb'))
-        ml = load(open('rdf_laser_laser2_paok.pkl', 'rb'))
+        ml = load(open('svm_condition_based.pkl', 'rb'))
     elif laser ==2:
         # ml = load(open('svm_laser_laser22.pkl', 'rb'))
-        ml = load(open('rdf_laser_laser2_paok.pkl', 'rb'))
+        ml = load(open('svm_condition_based.pkl', 'rb'))
     ml_based_decision = ml.predict(instance)
-    print(ml_based_decision[0])
+    ml.partial_fit(instance, y2)
+    # print(ml_based_decision[0])
     return (ml_based_decision[0])
 
 # Checks the heamodynamic Stability of the patient based on BP estimat biomarker
@@ -87,59 +90,61 @@ def getML_diagnosis(instance, laser):
 ct=0
 sc = StandardScaler()
 final_treat=""
+ml_treat=0
+ml_prob=0
 for i in range(len(instances)):
     X=(np.array(instances.iloc[i]).reshape(1,-1))
     bpd = X[0][7]
-    # print(X.shape)
-    # print(X[0][7])
-    # ml_dec=getML_decision(np.array(instances.iloc[i]).reshape(1,-1))
-    ml_diag=getML_diagnosis(X,laser)
-    # print(ml_diag)
-    # print(ml_treat, ml_prob)
-    if ml_diag == 3 or ml_diag==4 or ml_diag==2:
-        print("Hooray")
-        ml_treat,ml_prob=getML_treatment(X,laser)
-        # final_treat=ml_treat
-        if ml_treat == "Shock" and bpd>0:
-            print("nai")
+    # # print(X.shape)
+    # # print(X[0][7])
+    # # ml_dec=getML_decision(np.array(instances.iloc[i]).reshape(1,-1))
+    # ml_diag=getML_diagnosis(X,laser)
+    # # print(ml_diag)
+    # # print(ml_treat, ml_prob)
+    # if ml_diag == 3 or ml_diag==4 or ml_diag==2 or ml_diag==5:
+    # print("Hooray")
+    ml_treat, ml_prob=getML_treatment(X,laser)
+    # final_treat=ml_treat
+    if ml_treat == "Shock" and bpd>0:
+        # print("nai")
+        final_treat="Shock"
+    elif ml_treat == "No Shock" and bpd<0:
+        final_treat = "No Shock"
+    elif ml_treat == "Shock" and bpd<0:
+        print(ml_prob[0][1], "xyn")
+        # bpd = 1.6 * bpd
+
+        prob=ml_prob[0][1]*-1
+        if abs(prob) > 0.8:
+            prob=prob*2
+        else:
+            prob=prob*1.5
+        tmp_treat = bpd + prob
+        if tmp_treat<0:
             final_treat="Shock"
-        elif ml_treat == "No Shock" and bpd<0:
-            final_treat = "No Shock"
-        elif ml_treat == "Shock" and bpd<0:
-            print(ml_prob[0][1], "xyn")
-            # bpd = 1.6 * bpd
+        else:
+            final_treat="No Shock"
+    elif ml_treat == "No Shock" and bpd>0:
+        # bpd = 1.3 * bpd
+        if abs(bpd) > 1.5:
+            bpd = 2.5*bpd
+        # an to bpd einai poli egalitero tou 1 tote akou to gamidid to bpd
+        prob = ml_prob[0][0]*2
+        tmp_treat = bpd + prob
+        if tmp_treat<0:
+            final_treat="Shock"
+        else:
+            final_treat= "No Shock"
 
-            prob=ml_prob[0][1]*-1
-            if abs(prob) > 0.8:
-                prob=prob*2
-            else:
-                prob=prob*1.5
-            tmp_treat = bpd + prob
-            if tmp_treat<0:
-                final_treat="Shock"
-            else:
-                final_treat="No Shock"
-        elif ml_treat == "No Shock" and bpd>0:
-            # bpd = 1.3 * bpd
-            if abs(bpd) > 1.5:
-                bpd = 2.5*bpd
-            # an to bpd einai poli egalitero tou 1 tote akou to gamidid to bpd
-            prob = ml_prob[0][0]*2
-            tmp_treat = bpd + prob
-            if tmp_treat<0:
-                final_treat="Shock"
-            else:
-                final_treat= "No Shock"
-
-            print(ml_prob[0][0], "floki")
-            print(ml_prob[0], "floki")
-        print(treatment[i], final_treat)
+        # print(ml_prob[0][0], "floki")
+        # print(ml_prob[0], "floki")
+    # print(treatment[i], final_treat)
     else:
         final_treat="No Shock"
     if treatment[i] == final_treat:
         ct +=1
     else:
-        tmp.append([ml_prob,ml_treat, ml_diag, final_treat, bpd, treatment[i]])
+        tmp.append([ml_prob,ml_treat, final_treat, bpd, treatment[i]])
         print(tmp)
     print(ct / len(treatment))
 

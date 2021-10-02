@@ -716,8 +716,8 @@ def main(electrogram_path, perfusion_path,perfusion_path2, bp_path, period,num_l
     return output
 
 # # #
-# if __name__ == '__main__':
-#     output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK")
-#     output_pd = pd.DataFrame(output)
-#     output_pd.to_csv("paok.csv")
-#     print("Done")
+if __name__ == '__main__':
+    output = main(perfusion_path=lsr1, perfusion_path2=lsr2, bp_path=bp, electrogram_path=ecg, period=1,extra=0, num_lasers=2,treat="IDK")
+    output_pd = pd.DataFrame(output)
+    output_pd.to_csv("paok.csv")
+    print("Done")

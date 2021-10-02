@@ -77,41 +77,38 @@ for f in glob.glob("*"):
                 blood_pressure=(zf.open(bp))
                 print("???????????????????????????????", period)
                 if "Lead Noise" in period:
-                    label = 0
+                    label=0
                     print("noise")
                 elif "Normal" in period:
-                    label = 1
+                    label=1
                     print("normal")
                 elif "Baseline" in period:
-                    label = 1
+                    label=1
                     print("baseline")
                 elif "VVI" in period:
-                    label = 2
+                    label=3
                     print("vvi")
                 elif "AAI" in period:
-                    label = 3
+                    label=2
                     print("aai")
                 elif "VT" in period:
-                    label = 4
+                    label = 3
                     print("slow")
                 elif "NSR" in period:
-                    label = 1
+                    label =1
                     print("nsr")
                 elif "Recovery" in period:
                     label =1
                     print("nsr")
                 elif "VF" in period:
-                    label =5
+                    label =4
                     print("VF")
-
                 print(num_lasers)
                 patients=df.iloc[i].loc["Patient"]
                 file=df.iloc[i].loc["File"]
                 out = platform.main(patient=patients,flname=file,electrogram_path=ldrv,perfusion_path=lsr1, perfusion_path2=lsr2,bp_path=blood_pressure,period=label,num_lasers=num_lasers,extra=0, treat = shock, bp1=BP1, hrs=hrs)
-                if num_lasers ==1:
-                    csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_1/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
-                else:
-                    csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_2/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
+                csv="/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/instances/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
+                print(out)
                 out.to_csv(csv, index=False)
         else:
             # todo: rule based with perfusion
@@ -176,31 +173,22 @@ for f in glob.glob("*"):
                 print("???????????????????????????????",period)
                 if "Lead Noise" in period:
                     label=0
-                    print("noise")
                 elif "Normal" in period:
                     label=1
-                    print("normal")
                 elif "Baseline" in period:
                     label=1
-                    print("baseline")
                 elif "VVI" in period:
-                    label=2
-                    print("vvi")
-                elif "AAI" in period:
                     label=3
-                    print("aai")
+                elif "AAI" in period:
+                    label=2
                 elif "VT" in period:
-                    label = 4
-                    print("slow")
+                    label = 3
                 elif "NSR" in period:
                     label =1
-                    print("nsr")
                 elif "Recovery" in period:
                     label =1
-                    print("nsr")
                 elif "VF" in period:
-                    label =5
-                    print("VF")
+                    label =4
                 patients=df.iloc[i].loc["Patient"]
                 file=df.iloc[i].loc["File"]
                 out = platform.main(patient=patients,flname=file,electrogram_path="ldrv.txt",perfusion_path="lsr1.txt", perfusion_path2="lsr2.txt",bp_path="blood_pressure.txt",period=label,extra=begin,num_lasers=num_lasers, treat=shock,  bp1=BP1, hrs=hrs)
@@ -210,10 +198,7 @@ for f in glob.glob("*"):
             if len(tmp)>0:
                 print(len(tmp))
                 combined_csv = pd.concat(tmp)
-            if num_lasers == 1:
-                csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_1/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
-            else:
-                csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_2/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
+            csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/instances/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
             combined_csv.to_csv(csv, index=False)
     score = score+1
     print(score,"/",len(tempo))

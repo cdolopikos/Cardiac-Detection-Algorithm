@@ -1,5 +1,5 @@
 import os
-
+import numpy as np
 import torch
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -10,8 +10,9 @@ from sklearn.model_selection import train_test_split
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csv.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csvlaser_2.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/testing/combined_csv_laser_1_testing.csv"
+path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined testing/combined_csv_combined testing.csv"
+# path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined/combined_csv_combined.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined testing/combined_csv_combined testing.csv"
-path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined/combined_csv_combined.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_laser_2 copy.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/training/combined_csv_laser_1 copy.csv"
 # path = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/combined_csvlaser_1.csv"
