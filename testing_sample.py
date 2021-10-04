@@ -7,8 +7,10 @@ import pandas as pd
 import numpy as np
 import random
 
-
-os.chdir("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/laser_1")
+def randomizer():
+    n = random.randint(0, len(all_filenames))
+    return n
+os.chdir("/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/instances")
 cwd = os.getcwd()
 print(cwd)
 extension = 'csv'
@@ -18,9 +20,13 @@ print(len(all_filenames))
 sample = int(0.1 * len(all_filenames))
 print(sample)
 sample_files = []
-for i in range(sample):
-    n = random.randint(0,len(all_filenames))
-    sample_files.append(n)
+for i in range((sample)):
+    print(i)
+    n = randomizer()
+    if n not in sample_files:
+        sample_files.append(n)
+    else:
+        i -=1
 print(sample_files)
 
 for j in sample_files:

@@ -54,7 +54,7 @@ def supvm(att, lbl):
     # train model
     model.fit(att, lbl)
     print("Support Vector Machine setting up is finished")
-    dump(model, open('svm_treatment_based.pkl', 'wb'))
+    dump(model, open('svm_condition_based.pkl', 'wb'))
     # return model
 
 
@@ -62,34 +62,34 @@ def supvm(att, lbl):
 
 
 X = mldata.getAll_attributes()
-Y = mldata.y
-# X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
-# for i in range(1, 3):
-#     # if i == 1:
-#     #     # X = mldata.x1
-#     #     Y = mldata.y
-#     # # Y = mldata.y1
-#     # elif i == 2:
-#     #     print("Nai gamw tin poutana sou")
-#     #     Y = mldata.y1
-#     Y = mldata.y
-#     sc = StandardScaler()
-#     # X=sc.fit_transform(X)
-#     X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
-#
-#     # X_train = sc.fit_transform(X_train)
-#     # X_test = sc.fit_transform(X_test)
-#
-#     features_matrix = X_train
-#     # features_matrix = X
-#     # labels = Y
-#     labels = Y_train
-#     model = svm.SVC()
-#     test_feature_matrix = X_test
-#     test_labels = Y_test
+Y = mldata.y1
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
+for i in range(1, 3):
+    # if i == 1:
+    #     # X = mldata.x1
+    #     Y = mldata.y
+    # # Y = mldata.y1
+    # elif i == 2:
+    #     print("Nai gamw tin poutana sou")
+    #     Y = mldata.y1
+    Y = mldata.y1
+    sc = StandardScaler()
+    # X=sc.fit_transform(X)
+    X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.33)
+
+    # X_train = sc.fit_transform(X_train)
+    # X_test = sc.fit_transform(X_test)
+
+    features_matrix = X_train
+    # features_matrix = X
+    # labels = Y
+    labels = Y_train
+    model = svm.SVC()
+    test_feature_matrix = X_test
+    test_labels = Y_test
 #     for j in range(0, 10):
-#         svmDev(1)
-supvm(X, Y)
+    svmDev(2)
+# supvm(X, Y)
     # print(i)
 
 # rbf_feature = RBFSampler(gamma=0.1, random_state=1)

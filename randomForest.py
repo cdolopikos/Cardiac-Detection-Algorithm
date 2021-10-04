@@ -66,7 +66,7 @@ def rdfDev():
     return rfc
 
 
-# rdfDev()
+rdfDev()
 
 
 # Random Forest Classifier setup later used
@@ -81,7 +81,7 @@ def randonf(att, lbl):
     print(rfc.get_params())
     return rfc
 
-y = mldata.getAll_labels()
-x = mldata.getAll_attributes()
-
-randonf(x,y)
+# y = mldata.getAll_labels()
+# x = mldata.getAll_attributes()
+#
+# randonf(x,y)

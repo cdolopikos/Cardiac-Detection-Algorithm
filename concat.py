@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 
 # lasers=["laser_1","laser_2","laser_2_testing", "laser_1_testing"]
-lasers=["combined","combined testing"]
+lasers=["instances","instances_testing"]
 
 
 def concat():

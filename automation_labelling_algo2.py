@@ -198,7 +198,8 @@ for f in glob.glob("*"):
             if len(tmp)>0:
                 print(len(tmp))
                 combined_csv = pd.concat(tmp)
-            csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/instances/out_"+str(flname)+"_laser"+str(num_lasers)+".csv"
+            csv = "/Users/cmdgr/OneDrive - Imperial College London/pr_data/Preprocessed_data/instances/out_" + str(
+                flname) + "_laser" + str(num_lasers) + ".csv"
             combined_csv.to_csv(csv, index=False)
     score = score+1
     print(score,"/",len(tempo))
